@@ -12,14 +12,24 @@ import { User } from '../../schemas/user/user.schema';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async createUser(@Body() createUserData): Promise<User> {
-    return this.userService.createUser(createUserData);
+  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.userService.createUser(createUserDto);
   }
+
+  @Get()
+  async getAllUser(): Promise<User[]> {
+    return this.userService.getAllUser();
+  }
+
+  // @Patch('/me')
+  // async updateUser() {
+  //   return
+  // }
 
   // @Get()
   // findAll(): User[] {

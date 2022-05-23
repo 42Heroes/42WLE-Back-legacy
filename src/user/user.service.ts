@@ -1,5 +1,5 @@
 import { Model } from 'mongoose';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../schemas/user/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,11 +10,19 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async createUser(userData) {
+  async createUser(userData: CreateUserDto): Promise<UserDocument> {
     const newUser = new this.userModel(userData);
     const result = await newUser.save();
     console.log(result);
     return result;
+  }
+
+  async getAllUser(): Promise<UserDocument[]> {
+    const allUser = await this.userModel.find().exec();
+    if (!allUser) {
+      throw new NotFoundException(`Can't find`);
+    }
+    return allUser;
   }
 
   // async create(createCatDto: CreateCatDto): Promise<User[]> {
