@@ -10,16 +10,20 @@ export class User {
   @Prop({ required: true })
   nickname: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   intra_id: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   image_url: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   campus: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   createdAt: Date;
 
   @Prop([String])
@@ -46,14 +50,19 @@ export class User {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
   posts: Post[];
 
-  @Prop({ required: true })
+  @Prop()
   n_language: string[];
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   l_language: string[];
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   join_date: Date;
+
+  @Prop({ type: Boolean, default: false })
+  isRegisterDone: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

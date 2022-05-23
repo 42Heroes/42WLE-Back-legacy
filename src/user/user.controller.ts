@@ -11,6 +11,7 @@ import {
 import { User } from '../../schemas/user/user.schema';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -26,9 +27,19 @@ export class UserController {
     return this.userService.getAllUser();
   }
 
-  // @Patch('/me')
-  // async updateUser() {
-  //   return
+  @Get('/:id')
+  async getOneUser(@Param('id') userId: string) {
+    return this.userService.getOneUser(userId);
+  }
+
+  @Patch('/me')
+  async updateUser(@Body() updateUserDto: UpdateUserDto) {
+    return this.userService.updateUser(updateUserDto);
+  }
+
+  // @Delete('/:id')
+  // remove(@Param('id') userId: number) {
+  //   return this.userService.deleteOne(userId);
   // }
 
   // @Get()
@@ -45,11 +56,6 @@ export class UserController {
   // create(@Body() userData: any) {
   //   // any 부분은 dto를 정의하면서 채웁니다
   //   return this.userService.create(userData);
-  // }
-
-  // @Delete('/:id')
-  // remove(@Param('id') userId: number) {
-  //   return this.userService.deleteOne(userId);
   // }
 
   // @Patch('/:id')

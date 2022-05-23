@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../../schemas/user/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -10,33 +11,40 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async createUser(userData: CreateUserDto): Promise<UserDocument> {
-    const newUser = new this.userModel(userData);
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const newUser = new this.userModel(createUserDto);
     const result = await newUser.save();
     console.log(result);
     return result;
   }
 
-  async getAllUser(): Promise<UserDocument[]> {
+  async getOneUser(id: string): Promise<UserDocument> {
+    const user = await this.userModel.findById(id);
+
+    if (!user) {
+      throw new NotFoundException(`Can't find user ${id}`);
+    }
+
+    return user;
+  }
+
+  async getAllUser(): Promise<User[]> {
     const allUser = await this.userModel.find().exec();
     if (!allUser) {
       throw new NotFoundException(`Can't find`);
     }
     return allUser;
   }
+  async updateUser(updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.getOneUser(updateUserDto.id);
 
-  // async create(createCatDto: CreateCatDto): Promise<User[]> {
-  //   const newUser = new this.userModel({});
+    const { id, ...rest } = updateUserDto;
+    console.log(rest);
+    await user.updateOne(
+      // user.id : UpdateUserDto.id,
+      rest,
+    );
 
-  //   const createdCat = new this.userModel(createCatDto);
-  //   return createdCat.save();
-  // }
-
-  // async findAll(): Promise<User[]> {
-  //   return this.userModel.find().exec();
-  // }
-
-  // async findOne(): Promise<User> {
-  //   return this.userModel.findOne({});
-  // }
+    return user;
+  }
 }
