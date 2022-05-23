@@ -1,7 +1,7 @@
 import { Model } from 'mongoose';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from '../../schemas/user/user.schema';
+import { User, UserDocument } from '../schemas/user/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
@@ -35,15 +35,14 @@ export class UserService {
     }
     return allUser;
   }
+
   async updateUser(updateUserDto: UpdateUserDto): Promise<User> {
+    //TODO: Auth JWT 로 변경 예정
     const user = await this.getOneUser(updateUserDto.id);
 
     const { id, ...rest } = updateUserDto;
     console.log(rest);
-    await user.updateOne(
-      // user.id : UpdateUserDto.id,
-      rest,
-    );
+    await user.updateOne(rest);
 
     return user;
   }
