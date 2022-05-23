@@ -1,4 +1,4 @@
-import { IsString, IsDate } from 'class-validator';
+import { IsString, IsDate, IsNotEmpty, IsArray } from 'class-validator';
 
 type Language = {
   name:
@@ -30,15 +30,18 @@ export class UpdateUserDto {
   id: string;
 
   @IsString()
+  @IsNotEmpty()
   nickname: string;
 
   @IsString()
   image_url: string;
 
-  @IsString({ each: true })
+  @IsNotEmpty()
+  @IsArray({ each: true })
   n_language: Language[];
 
-  @IsString({ each: true })
+  @IsNotEmpty()
+  @IsArray({ each: true })
   l_language: Language[];
 
   @IsString({ each: true })
@@ -48,5 +51,6 @@ export class UpdateUserDto {
   github_id: string;
 
   @IsString()
+  @IsNotEmpty()
   introduction: string;
 }

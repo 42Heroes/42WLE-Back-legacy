@@ -2,7 +2,13 @@ import { IsString, IsDate } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
-  nickname: string;
+  imgae_url: string;
+
+  @IsString()
+  intra_id: string;
+
+  @IsString()
+  campus: string;
 }
 
 // export interface LanguageProps {
