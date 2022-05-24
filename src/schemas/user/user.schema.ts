@@ -58,7 +58,7 @@ export class User {
   l_language: string[];
 
   // @Prop({ required: true })
-  @Prop()
+  @Prop({ type: Date, default: new Date() })
   join_date: Date;
 
   @Prop({ type: Boolean, default: false })

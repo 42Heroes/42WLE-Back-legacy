@@ -8,7 +8,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { User } from '../schemas/user/user.schema';
+import { User, UserDocument } from '../schemas/user/user.schema';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,7 +18,9 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+  async createUser(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<UserDocument> {
     return this.userService.createUser(createUserDto);
   }
 

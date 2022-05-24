@@ -11,20 +11,26 @@ export class UserService {
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserDocument> {
     const newUser = new this.userModel(createUserDto);
     const result = await newUser.save();
-    console.log(result);
-    return result;
+    // console.log(result);
+    return result as UserDocument;
   }
 
   async getOneUser(intra_id: string): Promise<UserDocument> {
     const user = await this.userModel.findOne({ intra_id });
-
     if (!user) {
       throw new NotFoundException(`Can't find user ${intra_id}`);
     }
+    return user;
+  }
 
+  async isUser(intra_id: string): Promise<UserDocument> {
+    const user = await this.userModel.findOne({ intra_id });
+    if (!user) {
+      return null;
+    }
     return user;
   }
 
@@ -41,7 +47,7 @@ export class UserService {
     const user = await this.getOneUser(updateUserDto.id);
 
     const { id, ...rest } = updateUserDto;
-    console.log(rest);
+    // console.log(rest);
     await user.updateOne(rest);
 
     return user;
