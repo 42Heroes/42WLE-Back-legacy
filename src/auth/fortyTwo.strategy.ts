@@ -8,7 +8,7 @@ import { ConfigService } from '@nestjs/config';
 export class FortyTwoStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      cilentId:
+      clientID:
         'e62b1d70951c129cfe7d5cdf0e6d010df97760de2d6a4c0fc1415cfdc736a383',
       clientSecret:
         '36310cd2e0d990041233e99f535f29ee599c6e3bac3771cf50b05a2abac13465',
