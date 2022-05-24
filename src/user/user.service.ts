@@ -18,11 +18,11 @@ export class UserService {
     return result;
   }
 
-  async getOneUser(id: string): Promise<UserDocument> {
-    const user = await this.userModel.findById(id);
+  async getOneUser(intra_id: string): Promise<UserDocument> {
+    const user = await this.userModel.findOne({ intra_id });
 
     if (!user) {
-      throw new NotFoundException(`Can't find user ${id}`);
+      throw new NotFoundException(`Can't find user ${intra_id}`);
     }
 
     return user;
