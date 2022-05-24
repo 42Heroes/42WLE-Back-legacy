@@ -7,9 +7,9 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    return this.appService.getHello();
+    return 'hello';
   }
-  @Post('login')
+  @Get('login')
   login() {
     return 'hi';
   }
