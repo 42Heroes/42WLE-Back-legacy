@@ -1,25 +1,36 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private jwtService: JwtService,
+  ) {}
 
-  fortyTwoLogin(req) {
-    if (!req.user) {
-      return 'No user from 42';
+  async fortyTwoLogin(req) {
+    const { intra_id } = req;
+    const user = await this.userService.getOneUser(intra_id);
+
+    if (user) {
+      const payload = {
+        intra_id: user.intra_id,
+        nickname: user.nickname,
+        id: user.id,
+      };
+      const accessToken = await this.jwtService.sign(payload);
+
+      return { accessToken };
+    } else {
+      throw new UnauthorizedException('이거 문제 있음');
     }
-    console.log(req);
-    return {
-      message: 'User Info from 42',
-      user: req.user,
-    };
   }
 
-  validateUser(intra_id: string) {
-    const user = this.userService.getOneUser(intra_id);
+  async validateUser(intra_id: string) {
+    const user = await this.userService.getOneUser(intra_id);
     if (!user) {
-      throw new UnauthorizedException();
+      return null;
     }
     return user;
   }
