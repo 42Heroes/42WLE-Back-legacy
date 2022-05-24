@@ -1,5 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 
@@ -8,15 +7,12 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
   ) {}
 
   async fortyTwoLogin(req) {
-    console.log('in Ft');
-    console.log(req);
     const { login: intra_id, campus, image_url } = req;
     let user = await this.userService.isUser(intra_id);
-    console.log(user);
+
     if (!user) {
       const createData = {
         intra_id,
@@ -32,11 +28,10 @@ export class AuthService {
       nickname: user.nickname,
       id: user.id,
     };
-    console.log(process.env.JWT_SECRET);
+
     const accessToken = await this.jwtService.sign(payload);
-    console.log('accesssssssssssssssssssToken');
-    console.log(accessToken);
-    return { accessToken };
+
+    return { accessToken, user };
   }
 
   async validateUser(intra_id: string) {

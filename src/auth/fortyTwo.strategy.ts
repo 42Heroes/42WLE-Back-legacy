@@ -26,10 +26,6 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     done,
   ): Promise<any> {
     const userInfo = profile._json;
-    // const user = this.authService.validateUser(login);
-    // if (!user) {
-    //   throw new UnauthorizedException();
-    // }
     return userInfo;
   }
 }
