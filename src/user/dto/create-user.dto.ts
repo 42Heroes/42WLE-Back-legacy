@@ -2,7 +2,7 @@ import { IsString, IsDate } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
-  imgae_url: string;
+  image_url: string;
 
   @IsString()
   intra_id: string;

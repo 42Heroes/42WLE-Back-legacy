@@ -7,7 +7,7 @@ export type UserDocument = User & mongoose.Document;
 
 @Schema()
 export class User {
-  @Prop({ required: true })
+  @Prop()
   nickname: string;
 
   // @Prop({ required: true })
