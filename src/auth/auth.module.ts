@@ -4,13 +4,17 @@ import { AuthService } from './auth.service';
 import { FortyTwoStrategy } from './fortyTwo.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     UserModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: 60 * 5 },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        secret: config.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: 60 * 5 },
+      }),
     }),
   ],
   controllers: [AuthController],
