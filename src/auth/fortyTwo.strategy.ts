@@ -1,14 +1,16 @@
 // import { Strategy } from 'passport-local';
 import { Strategy } from 'passport-42';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
 
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy) {
-  constructor(private authService: AuthService) {
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+  ) {
     super({
       clientID:
         'e62b1d70951c129cfe7d5cdf0e6d010df97760de2d6a4c0fc1415cfdc736a383',
@@ -38,12 +40,8 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     profile: any,
     done,
   ): Promise<any> {
-    const { login } = profile._json;
-    console.log(profile._json);
-    const user = this.authService.validateUser(login);
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    return user;
+    const userInfo = profile._json;
+    // TODO: user validation 필요; 있을 때, 없을 때
+    return userInfo;
   }
 }

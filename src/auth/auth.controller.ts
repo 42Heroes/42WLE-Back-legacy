@@ -13,15 +13,9 @@ export class AuthController {
     return 'success';
   }
 
-  @Get()
-  async checkIndex() {
-    return 'success';
-  }
-
   @Get('/42/callback')
   @UseGuards(AuthGuard('42'))
-  fortyTwoAuthRedirect(a, b, c, d, e) {
-    // return this.authService.fortyTwoLogin(req);
-    return 'good';
+  fortyTwoAuthRedirect(@Req() req) {
+    return this.authService.fortyTwoLogin(req.user);
   }
 }
