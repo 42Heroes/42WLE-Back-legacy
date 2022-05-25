@@ -17,7 +17,7 @@ export class UserController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getMyInfo(@GetUser() user: UserDocument) {
-    return this.userService.getOneUser(user.intra_id);
+    return this.userService.getOneUser(user.id);
   }
 
   @Patch('/me')
