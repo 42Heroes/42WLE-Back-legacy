@@ -1,9 +1,6 @@
-// import { Strategy } from 'passport-local';
 import { Strategy } from 'passport-42';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { UserService } from 'src/user/user.service';
+import { Injectable } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Injectable()
@@ -23,7 +20,6 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy) {
     accessToken: string,
     refreshToken: string,
     profile: any,
-    done,
   ): Promise<any> {
     const userInfo = profile._json;
     return userInfo;
