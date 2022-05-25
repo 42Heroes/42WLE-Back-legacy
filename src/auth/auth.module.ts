@@ -1,14 +1,15 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { FortyTwoStrategy } from './fortyTwo.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 import { ConfigService } from '@nestjs/config';
+import { JwtStrategy } from './jwt.strategy';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
-    UserModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -16,8 +17,10 @@ import { ConfigService } from '@nestjs/config';
         signOptions: { expiresIn: 60 * 5 },
       }),
     }),
+    forwardRef(() => UserModule),
   ],
   controllers: [AuthController],
-  providers: [AuthService, FortyTwoStrategy],
+  providers: [AuthService, FortyTwoStrategy, JwtStrategy, PassportModule],
+  exports: [JwtStrategy, PassportModule],
 })
 export class AuthModule {}
