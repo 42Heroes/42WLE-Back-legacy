@@ -2,6 +2,7 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { FortyTwoAuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { FortyTwoDto } from './dto/fortyTwo.dto';
 import { GetUser } from './get-user.decorator';
 
 @Controller('auth')
@@ -16,7 +17,7 @@ export class AuthController {
 
   @UseGuards(FortyTwoAuthGuard)
   @Get('/42/callback')
-  fortyTwoAuthRedirect(@GetUser() user) {
-    return this.authService.fortyTwoLogin(user);
+  fortyTwoAuthRedirect(@GetUser() fortyTwoDto: FortyTwoDto) {
+    return this.authService.fortyTwoLogin(fortyTwoDto);
   }
 }

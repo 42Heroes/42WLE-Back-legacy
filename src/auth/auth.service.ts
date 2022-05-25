@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
+import { FortyTwoDto } from './dto/fortyTwo.dto';
 
 @Injectable()
 export class AuthService {
@@ -9,8 +10,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async fortyTwoLogin(req) {
-    const { login: intra_id, campus, image_url } = req;
+  async fortyTwoLogin(fortyTwoDto: FortyTwoDto) {
+    const { login: intra_id, campus, image_url } = fortyTwoDto;
+
     let user = await this.userService.isUser(intra_id);
 
     if (!user) {
@@ -23,13 +25,14 @@ export class AuthService {
       };
       user = await this.userService.createUser(createData);
     }
+
     const payload = {
       intra_id: user.intra_id,
       nickname: user.nickname,
       id: user.id,
     };
 
-    const accessToken = await this.jwtService.sign(payload);
+    const accessToken = this.jwtService.sign(payload);
 
     return { accessToken, user };
   }
