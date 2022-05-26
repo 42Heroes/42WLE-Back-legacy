@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
 import { User, UserDocument } from '../schemas/user/user.schema';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -27,6 +35,24 @@ export class UserController {
     @GetUser() user: UserDocument,
   ) {
     return this.userService.updateUser(updateUserDto, user.id);
+  }
+
+  @Patch('/me/like/:id')
+  @UseGuards(JwtAuthGuard)
+  async addLikeUser(
+    @Param('id') targetId: string,
+    @GetUser() user: UserDocument,
+  ) {
+    return this.userService.addLikeUser(targetId, user.id);
+  }
+
+  @Delete('/me/like/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteLikeUser(
+    @Param('id') targetId: string,
+    @GetUser() user: UserDocument,
+  ) {
+    return this.userService.deleteLikeUser(targetId, user.id);
   }
 
   @Get('/:id')

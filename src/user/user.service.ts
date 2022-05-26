@@ -1,5 +1,9 @@
 import { Model } from 'mongoose';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schemas/user/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -50,12 +54,49 @@ export class UserService {
     updateUserDto: UpdateUserDto,
     userId: string,
   ): Promise<UserDocument> {
-    const updatedUser = await this.userModel.findOneAndUpdate(
-      { _id: userId },
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      userId,
       { ...updateUserDto, isRegisterDone: true },
       { new: true },
     );
 
     return updatedUser;
+  }
+
+  async addLikeUser(targetId: string, userId: string) {
+    if (targetId === userId) {
+      throw new BadRequestException();
+    }
+    const user = await this.getOneUser(userId);
+    const targetUser = await this.getOneUser(targetId);
+
+    try {
+      await user.updateOne({ $addToSet: { liked_users: targetUser } }).exec();
+    } catch (error) {
+      throw new BadRequestException(
+        `${user?.nickname} 의 likedUsers 에 ${targetUser?.nickname} 추가 실패`,
+      );
+    }
+
+    return {
+      message: `${user.nickname} 의 likedUsers 에 ${targetUser.nickname} 추가 성공 `,
+    };
+  }
+
+  async deleteLikeUser(targetId: string, userId: string) {
+    const user = await this.getOneUser(userId);
+    const targetUser = await this.getOneUser(targetId);
+
+    try {
+      await user.updateOne({ $pull: { liked_users: targetUser.id } }).exec();
+    } catch (error) {
+      throw new BadRequestException(
+        `${user?.nickname} 의 likedUsers 에서 ${targetUser?.nickname} 제거 실패 `,
+      );
+    }
+
+    return {
+      message: `${user.nickname} 의 likedUsers 에서 ${targetUser.nickname} 제거 성공 `,
+    };
   }
 }
