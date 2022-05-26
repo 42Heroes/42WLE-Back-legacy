@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { User, UserDocument } from '../schemas/user/user.schema';
@@ -28,7 +29,7 @@ export class UserController {
     return this.userService.getOneUser(user.id);
   }
 
-  @Patch('/me')
+  @Put('/me')
   @UseGuards(JwtAuthGuard)
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
