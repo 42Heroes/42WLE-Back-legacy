@@ -49,6 +49,7 @@ export class UpdateUserDto {
 
   @IsString()
   @IsNotEmpty()
+  @IsOptional()
   image_url: string;
 
   @IsString()
