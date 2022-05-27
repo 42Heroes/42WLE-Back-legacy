@@ -63,6 +63,15 @@ export class UserService {
     return updatedUser;
   }
 
+  async updateProfileImage(userId: string, image_url: string) {
+    const user = await this.getOneUser(userId);
+    user.image_url = image_url;
+
+    await user.save();
+
+    return { message: `${user.nickname} 의 profile-image 변경 성공` };
+  }
+
   async addLikeUser(targetId: string, userId: string) {
     if (targetId === userId) {
       throw new BadRequestException();
