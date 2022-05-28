@@ -1,6 +1,7 @@
 export enum SocketEvents {
   Authorization = 'Authorization',
   Message = 'Message',
-  InitialData = 'InitialData',
+  ReqInitialData = 'ReqInitialData',
   Error = 'Error',
+  ReqCreateRoom = 'ReqCreateRoom',
 }

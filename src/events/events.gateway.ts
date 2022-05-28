@@ -11,6 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { WsGuard } from 'src/auth/auth.guard';
+import { SendMessageDto } from 'src/chat/dto/sendMessage.dto';
 import { SocketEvents } from './event.enum';
 import { EventsService } from './events.service';
 
@@ -27,10 +28,23 @@ export class EventsGateway
   }
 
   // * 메시지
-  @UseGuards(WsGuard)
+  // @UseGuards(WsGuard)
   @SubscribeMessage(SocketEvents.Message)
-  handleMessage(@ConnectedSocket() socket: Socket, @MessageBody() data) {
-    console.log(socket.data);
+  handleMessage(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() sendMessageDto: SendMessageDto,
+  ) {
+    return this.eventService.sendMessage(socket, sendMessageDto);
+  }
+
+  // * 채팅방 생성 요청
+  // @UseGuards(WsGuard)
+  @SubscribeMessage(SocketEvents.ReqCreateRoom)
+  createRoom(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('target') targetId: string,
+  ) {
+    return this.eventService.createRoom(socket, targetId);
   }
 
   // * 1회 인증 및 socket 유저 데이터 주입
@@ -43,8 +57,8 @@ export class EventsGateway
     return this.eventService.authorization(socket, token);
   }
 
-  // 초기 데이터 가져오기
-  @SubscribeMessage(SocketEvents.InitialData)
+  // * 초기 데이터 가져오기
+  @SubscribeMessage(SocketEvents.ReqInitialData)
   initialData(@ConnectedSocket() socket: Socket) {
     return this.eventService.getInitialData(socket);
   }
@@ -62,8 +76,13 @@ export class EventsGateway
   1. 소켓 연결 (socket.data.authenticate = false 로 초기화) ok
   2. 클라이언트 jwt 발급 후 authorization 이벤트 발송 (Token 포함) ok
   3. jwt token 확인 후 socket.data.authenticate = true, 기본 data 설정 후 authenticate 성공 이벤트 발송 ok
-  4. 클라이언트 성공 이벤트 확인 후 initialData 요청
-  5. initialData
+  4. 클라이언트 성공 이벤트 확인 후 initialData 요청 ok
+  5. initialData 취합 ok
+*/
+
+/*
+  1. 
+
 */
 
 /*
