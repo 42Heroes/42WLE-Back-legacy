@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ChatRoom, ChatRoomSchema } from 'src/schemas/chatRoom/chatRoom.schema';
 import { Message, MessageSchema } from 'src/schemas/message/message.schema';
+import { UserModule } from 'src/user/user.module';
 import { ChatService } from './chat.service';
 
 @Module({
@@ -24,7 +25,9 @@ import { ChatService } from './chat.service';
         },
       },
     ]),
+    UserModule,
   ],
   providers: [ChatService],
+  exports: [ChatService],
 })
 export class ChatModule {}
