@@ -8,13 +8,15 @@ export type MessageDocument = Message & Document;
 @Schema()
 export class Message {
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Chatroom' }],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Chatroom',
     required: true,
   })
   chatRoom_id: ChatRoom;
 
   @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
   })
   user_id: User;
@@ -25,7 +27,7 @@ export class Message {
   @Prop({ required: true })
   content: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: new Date() })
   createdAt: Date;
 }
 
