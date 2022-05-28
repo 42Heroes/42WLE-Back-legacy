@@ -14,7 +14,9 @@ export class ChatRoom {
 
   @Prop({
     required: true,
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    type: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true },
+    ],
   })
   users: User[];
 }
