@@ -1,5 +1,13 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  Injectable,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
+import { Observable } from 'rxjs';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class FortyTwoAuthGuard extends AuthGuard('42') {
@@ -18,3 +26,34 @@ export class FortyTwoAuthGuard extends AuthGuard('42') {
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {}
+
+@Injectable()
+export class WsGuard implements CanActivate {
+  constructor(
+    private readonly userService: UserService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> | any {
+    const socket = context.getArgByIndex(0);
+    // if (!socket.data.authenticate) {
+    //   return false;
+    // }
+    const bearerToken = socket.handshake.headers.authorization.split(' ')[1];
+    try {
+      const decoded = this.jwtService.verify(bearerToken, {
+        secret: 'gamguma',
+      });
+      console.log(decoded);
+      return new Promise((resolve, reject) => {
+        return this.userService
+          .getOneUser(decoded.id)
+          .then((user) => (user ? resolve(user) : reject(user)));
+      });
+    } catch (error) {
+      return false;
+    }
+  }
+}

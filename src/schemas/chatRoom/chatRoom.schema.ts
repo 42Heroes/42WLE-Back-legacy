@@ -2,37 +2,26 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { User } from '../user/user.schema';
 
-export type ChatRoomDocument = ChatRoom & Document;
+export type ChatRoomDocument = ChatRoom & mongoose.Document;
 
 @Schema()
 export class ChatRoom {
-  @Prop({
-    required: true,
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  })
-  author: User;
-
-  @Prop({ required: true })
+  @Prop({ required: true, default: new Date() })
   createdAt: Date;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: new Date() })
   updatedAt: Date;
-
-  @Prop({ required: true })
-  content: string;
 
   @Prop({
     required: true,
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    type: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true },
+    ],
   })
-  likes: User[];
+  users: User[];
 
-  @Prop({ required: true, default: false })
-  isDeleted: boolean;
-
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }] })
-  comments: Comment[];
+  @Prop({ default: [] })
+  messages: [];
 }
 
 export const ChatRoomSchema = SchemaFactory.createForClass(ChatRoom);
