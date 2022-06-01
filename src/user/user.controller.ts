@@ -1,9 +1,19 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { User, UserDocument } from '../schemas/user/user.schema';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GetUser } from 'src/auth/get-user.decorator';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Controller('users')
 export class UserController {
@@ -20,13 +30,43 @@ export class UserController {
     return this.userService.getOneUser(user.id);
   }
 
-  @Patch('/me')
+  @Put('/me')
   @UseGuards(JwtAuthGuard)
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
     @GetUser() user: UserDocument,
   ) {
     return this.userService.updateUser(updateUserDto, user.id);
+  }
+
+  @Patch('/me/profile')
+  @UseGuards(JwtAuthGuard)
+  async updateProfileImage(
+    @GetUser() user: UserDocument,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ) {
+    return this.userService.updateProfileImage(
+      user.id,
+      updateProfileDto.image_url,
+    );
+  }
+
+  @Patch('/me/like/:id')
+  @UseGuards(JwtAuthGuard)
+  async addLikeUser(
+    @Param('id') targetId: string,
+    @GetUser() user: UserDocument,
+  ) {
+    return this.userService.addLikeUser(targetId, user.id);
+  }
+
+  @Delete('/me/like/:id')
+  @UseGuards(JwtAuthGuard)
+  async deleteLikeUser(
+    @Param('id') targetId: string,
+    @GetUser() user: UserDocument,
+  ) {
+    return this.userService.deleteLikeUser(targetId, user.id);
   }
 
   @Get('/:id')

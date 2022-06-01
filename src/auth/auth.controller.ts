@@ -15,7 +15,7 @@ export class AuthController {
   }
 
   @UseGuards(FortyTwoAuthGuard)
-  @Get('/42/callback')
+  @Get('/social/42')
   fortyTwoAuthRedirect(@GetUser() fortyTwoDto: FortyTwoDto) {
     return this.authService.fortyTwoLogin(fortyTwoDto);
   }
