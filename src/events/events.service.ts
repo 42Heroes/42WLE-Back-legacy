@@ -6,6 +6,7 @@ import { UserService } from '../user/user.service';
 import { ChatService } from 'src/chat/chat.service';
 import { SendMessageDto } from 'src/chat/dto/sendMessage.dto';
 import { MessageDocument } from 'src/schemas/message/message.schema';
+import { userMap } from './userMap';
 
 @Injectable()
 export class EventsService {
@@ -16,7 +17,17 @@ export class EventsService {
   ) {}
 
   async createRoom(socket: Socket, targetUserId: string) {
-    return this.chatService.createChatRoom(socket.data.id, targetUserId);
+    const newRoom = await this.chatService.createChatRoom(
+      socket.data.id,
+      targetUserId,
+    );
+    const payload = { status: 'ok', chatRoom: newRoom };
+    socket.join(newRoom.id);
+    if (userMap.has(targetUserId)) {
+      socket.in(userMap.get(targetUserId)).socketsJoin(newRoom.id);
+      socket.broadcast.to(newRoom.id).emit(SocketEvents.ReqCreateRoom, payload);
+    }
+    return payload;
   }
 
   async getInitialData(socket: Socket) {
@@ -33,7 +44,7 @@ export class EventsService {
         const messages = await this.chatService.getAllMessages(chatRoom.id);
 
         return {
-          chatRoom,
+          ...chatRoom.toObject(),
           messages,
         };
       }),
@@ -68,7 +79,7 @@ export class EventsService {
       socket.data.authenticate = true;
       socket.data.id = decode.id;
       socket.data.intra_id = decode.intra_id;
-
+      userMap.set(decode.id, socket.id);
       return {
         status: 'ok',
         message: '인증에 성공했습니다.',

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { WsException } from '@nestjs/websockets';
 import { Model } from 'mongoose';
 import {
   ChatRoom,
@@ -24,18 +25,39 @@ export class ChatService {
     return result;
   }
 
-  async createMessage(author: string, sendMessageDto: SendMessageDto) {
+  async createMessage(user_id: string, sendMessageDto: SendMessageDto) {
     const newMessage = new this.messageModel({
       ...sendMessageDto,
-      user_id: author,
+      user_id,
     });
     const result = await newMessage.save();
     return result;
   }
 
+  async getChatRoom(chatRoom_id: string) {
+    const chatRoom = this.chatRoomModel.findById(chatRoom_id);
+    if (!chatRoom) {
+      throw new WsException(`not found ChatRoom ${chatRoom_id}`);
+    }
+
+    return chatRoom;
+  }
+
   async createChatRoom(myId: string, otherId: string) {
-    const me = await this.userService.getOneUser(myId);
-    const other = await this.userService.getOneUser(otherId);
+    const me = await (
+      await this.userService.getOneUser(myId)
+    ).populate('chatRooms');
+    const other = await (
+      await this.userService.getOneUser(otherId)
+    ).populate('chatRooms');
+
+    const foundRoom = me.chatRooms.find((chatRoom) =>
+      other.chatRooms.some((otherChatRoom) => otherChatRoom.id === chatRoom.id),
+    );
+
+    if (foundRoom) {
+      return foundRoom;
+    }
 
     try {
       const newChatRoom = new this.chatRoomModel();
