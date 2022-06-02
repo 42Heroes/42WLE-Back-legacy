@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { FortyTwoDto } from './dto/fortyTwo.dto';
@@ -8,6 +9,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly config: ConfigService,
   ) {}
 
   async fortyTwoLogin(fortyTwoDto: FortyTwoDto) {
@@ -32,9 +34,9 @@ export class AuthService {
       id: user.id,
     };
 
-    const accessToken = this.jwtService.sign(payload);
+    const tokens = this.getToken(payload);
 
-    return { accessToken, user };
+    return { tokens, user };
   }
 
   async validateUser(intra_id: string) {
@@ -43,5 +45,27 @@ export class AuthService {
       return null;
     }
     return user;
+  }
+
+  async updateRtUser(user_id: string) {
+    const user = await this.userService.getOneUser(user_id);
+  }
+
+  async getToken(payload: any) {
+    const [at, rt] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        secret: this.config.get<string>('JWT_AT_SECRET'),
+        expiresIn: 60 * 15,
+      }),
+      this.jwtService.signAsync(payload, {
+        secret: this.config.get<string>('JWT_RT_SECRET'),
+        expiresIn: 60 * 60 * 24 * 7,
+      }),
+    ]);
+
+    return {
+      accessToken: at,
+      refreshToken: rt,
+    };
   }
 }
