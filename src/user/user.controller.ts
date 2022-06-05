@@ -46,8 +46,8 @@ export class UserController {
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
     return this.userService.updateProfileImage(
-      user.id,
       updateProfileDto.image_url,
+      user.id,
     );
   }
 

@@ -23,7 +23,7 @@ export class UserService {
   }
 
   async getOneUser(userId: string): Promise<UserDocument> {
-    const user = await this.userModel.findById(userId);
+    const user = await this.userModel.findById(userId).populate('liked_users');
 
     if (!user) {
       throw new NotFoundException(`Can't find user ${userId}`);
@@ -63,7 +63,7 @@ export class UserService {
     return updatedUser;
   }
 
-  async updateProfileImage(userId: string, image_url: string) {
+  async updateProfileImage(image_url: string, userId: string) {
     const user = await this.getOneUser(userId);
     user.image_url = image_url;
 
