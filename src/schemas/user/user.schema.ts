@@ -1,25 +1,29 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { ChatRoom } from 'schemas/chatRoom/chatRoom.schema';
-import { Post } from 'schemas/post/post.schema';
+import { ChatRoom } from 'src/schemas/chatRoom/chatRoom.schema';
+import { Post } from 'src/schemas/post/post.schema';
 
-export type UserDocument = User & Document;
+export type UserDocument = User & mongoose.Document;
 
 @Schema()
 export class User {
-  @Prop({ required: true })
+  @Prop()
   nickname: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   intra_id: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   image_url: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   campus: string;
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   createdAt: Date;
 
   @Prop([String])
@@ -46,14 +50,19 @@ export class User {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
   posts: Post[];
 
-  @Prop({ required: true })
+  @Prop()
   n_language: string[];
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop()
   l_language: string[];
 
-  @Prop({ required: true })
+  // @Prop({ required: true })
+  @Prop({ type: Date, default: new Date() })
   join_date: Date;
+
+  @Prop({ type: Boolean, default: false })
+  isRegisterDone: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
