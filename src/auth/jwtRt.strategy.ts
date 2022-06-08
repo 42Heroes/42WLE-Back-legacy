@@ -2,9 +2,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Request } from 'express';
 import * as bcrypt from 'bcrypt';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { cookieExtractor } from './cookieExtractor';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 
@@ -27,9 +30,17 @@ export class JwtRtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
   }
   async validate(req: Request, payload: any) {
     const user = await this.userService.getOneUser(payload.id);
-    const isMatch = await bcrypt.compare(req.cookies['refresh-token'], user.rt);
-    if (!isMatch) {
-      throw new UnauthorizedException();
+
+    try {
+      const isMatch = await bcrypt.compare(
+        req.cookies['refresh-token'],
+        user.rt,
+      );
+      if (!isMatch) {
+        throw new UnauthorizedException();
+      }
+    } catch (error) {
+      throw new BadRequestException();
     }
 
     return user;

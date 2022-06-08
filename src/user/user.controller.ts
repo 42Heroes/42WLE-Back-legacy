@@ -8,6 +8,9 @@ import {
   Put,
   UseGuards,
   Req,
+  Post,
+  Res,
+  HttpCode,
 } from '@nestjs/common';
 import { User, UserDocument } from '../schemas/user/user.schema';
 import { UserService } from './user.service';
@@ -15,7 +18,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Controller('users')
 export class UserController {
@@ -29,9 +32,6 @@ export class UserController {
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getMyInfo(@GetUser() user: UserDocument, @Req() req: Request) {
-    console.log(req.cookies);
-    console.log(req.headers);
-
     return this.userService.getOneUser(user.id);
   }
 
@@ -72,6 +72,17 @@ export class UserController {
     @GetUser() user: UserDocument,
   ) {
     return this.userService.deleteLikeUser(targetId, user.id);
+  }
+
+  @Post('/me/logout')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  async logoutUser(
+    @GetUser() user: UserDocument,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    res.clearCookie('refresh-token');
+    return await this.userService.logoutUser(user.id);
   }
 
   @Get('/:id')

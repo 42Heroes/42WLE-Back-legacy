@@ -17,8 +17,9 @@ export class FortyTwoAuthGuard extends AuthGuard('42') {
 
   handleRequest(err: any, user: any, info: any, context: any, status: any) {
     // TODO: invalid token error handling 필요합니닷
+
     if (err || !user) {
-      throw new HttpException(err.message, err.status);
+      throw new HttpException('토큰 교환 중 문제가 발생했습니다.', err.status);
     }
     return user;
   }
@@ -56,7 +57,7 @@ export class WsGuard implements CanActivate {
       const decoded = this.jwtService.verify(bearerToken, {
         secret: 'gamguma',
       });
-      console.log(decoded);
+
       return new Promise((resolve, reject) => {
         return this.userService
           .getOneUser(decoded.id)
