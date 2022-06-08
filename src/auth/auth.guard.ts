@@ -25,7 +25,17 @@ export class FortyTwoAuthGuard extends AuthGuard('42') {
 }
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {}
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(private readonly jwtService: JwtService) {
+    super();
+  }
+}
+@Injectable()
+export class JwtRefreshGuard extends AuthGuard('jwt-refresh') {
+  constructor(private readonly jwtService: JwtService) {
+    super();
+  }
+}
 
 @Injectable()
 export class WsGuard implements CanActivate {

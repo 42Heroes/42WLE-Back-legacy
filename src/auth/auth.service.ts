@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { FortyTwoDto } from './dto/fortyTwo.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -34,9 +35,11 @@ export class AuthService {
       id: user.id,
     };
 
-    const tokens = this.getToken(payload);
-
-    return { tokens, user };
+    const tokens = await this.getToken(payload);
+    user.rt = await bcrypt.hash(tokens.refreshToken, 10);
+    // TODO: 누군가 탈취해서 우리코드로 보내면 뚫리는거 아닌가? hash가 소용있나?
+    await user.save();
+    return { tokens };
   }
 
   async validateUser(intra_id: string) {
@@ -68,4 +71,22 @@ export class AuthService {
       refreshToken: rt,
     };
   }
+  async getACToken(user) {
+    const payload = {
+      intra_id: user.intra_id,
+      nickname: user.nickname,
+      id: user.id,
+    };
+    const at = await this.jwtService.signAsync(payload, {
+      secret: this.config.get<string>('JWT_AT_SECRET'),
+      expiresIn: 60 * 15,
+    });
+
+    return at;
+  }
 }
+
+// export const hash = async (plainText: string): Promise<string> => {
+//   const saltOrRounds = 10;
+//   return await bcrypt.hash(plainText, saltOrRounds);
+// };

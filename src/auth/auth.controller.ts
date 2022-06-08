@@ -1,5 +1,7 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
-import { FortyTwoAuthGuard } from './auth.guard';
+import { Controller, Get, Res, UseGuards } from '@nestjs/common';
+import { Response } from 'express';
+import { User } from 'src/schemas/user/user.schema';
+import { FortyTwoAuthGuard, JwtRefreshGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { FortyTwoDto } from './dto/fortyTwo.dto';
 import { GetUser } from './get-user.decorator';
@@ -16,7 +18,21 @@ export class AuthController {
 
   @UseGuards(FortyTwoAuthGuard)
   @Get('/social/42')
-  fortyTwoAuthRedirect(@GetUser() fortyTwoDto: FortyTwoDto) {
-    return this.authService.fortyTwoLogin(fortyTwoDto);
+  async fortyTwoAuthRedirect(
+    @GetUser() fortyTwoDto: FortyTwoDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const { tokens } = await this.authService.fortyTwoLogin(fortyTwoDto);
+    res.cookie('refresh-token', tokens.refreshToken, {
+      httpOnly: true,
+    });
+
+    return tokens.accessToken;
+  }
+
+  @UseGuards(JwtRefreshGuard)
+  @Get('/refresh')
+  async silentRefresh(@GetUser() user: User) {
+    return this.authService.getACToken(user);
   }
 }
