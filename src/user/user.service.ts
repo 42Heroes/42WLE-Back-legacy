@@ -8,6 +8,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schemas/user/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
 export class UserService {
@@ -63,9 +64,9 @@ export class UserService {
     return updatedUser;
   }
 
-  async updateProfileImage(userId: string, image_url: string) {
+  async updateProfileImage(userId: string, updateProfileDto: UpdateProfileDto) {
     const user = await this.getOneUser(userId);
-    user.image_url = image_url;
+    user.image_url = updateProfileDto.image_url;
 
     await user.save();
 

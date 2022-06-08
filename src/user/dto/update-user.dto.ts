@@ -4,7 +4,6 @@ import {
   IsArray,
   IsOptional,
   Length,
-  MaxLength,
   ArrayNotEmpty,
   ArrayMaxSize,
   ArrayUnique,
@@ -49,12 +48,7 @@ export class UpdateUserDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  image_url: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(20)
+  @Length(3, 20)
   nickname: string;
 
   @IsArray()

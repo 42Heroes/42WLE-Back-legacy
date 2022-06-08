@@ -50,10 +50,7 @@ export class UserController {
     @GetUser() user: UserDocument,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    return this.userService.updateProfileImage(
-      user.id,
-      updateProfileDto.image_url,
-    );
+    return this.userService.updateProfileImage(user.id, updateProfileDto);
   }
 
   @Patch('/me/like/:id')
