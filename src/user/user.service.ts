@@ -80,6 +80,10 @@ export class UserService {
     const user = await this.getOneUser(userId);
     const targetUser = await this.getOneUser(targetId);
 
+    if (!user || !targetUser) {
+      throw new BadRequestException();
+    }
+
     try {
       await user.updateOne({ $addToSet: { liked_users: targetUser } }).exec();
     } catch (error) {
@@ -94,8 +98,16 @@ export class UserService {
   }
 
   async deleteLikeUser(targetId: string, userId: string) {
+    if (targetId === userId) {
+      throw new BadRequestException();
+    }
+
     const user = await this.getOneUser(userId);
     const targetUser = await this.getOneUser(targetId);
+
+    if (!user || !targetUser) {
+      throw new BadRequestException();
+    }
 
     try {
       await user.updateOne({ $pull: { liked_users: targetUser.id } }).exec();
@@ -108,5 +120,14 @@ export class UserService {
     return {
       message: `${user.nickname} 의 likedUsers 에서 ${targetUser.nickname} 제거 성공 `,
     };
+  }
+
+  async logoutUser(userId: string) {
+    const user = await this.getOneUser(userId);
+
+    user.rt = null;
+    await user.save();
+
+    return 'logout success';
   }
 }

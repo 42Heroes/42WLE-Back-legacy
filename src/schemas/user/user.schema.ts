@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { ChatRoom } from 'src/schemas/chatRoom/chatRoom.schema';
+import { ChatRoomDocument } from 'src/schemas/chatRoom/chatRoom.schema';
 import { Post } from 'src/schemas/post/post.schema';
 
 export type UserDocument = User & mongoose.Document;
@@ -39,7 +39,7 @@ export class User {
   introduction: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ChatRoom' }] })
-  chatRooms: ChatRoom[];
+  chatRooms: ChatRoomDocument[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }] })
   liked_users: User[];
@@ -63,6 +63,9 @@ export class User {
 
   @Prop({ type: Boolean, default: false })
   isRegisterDone: boolean;
+
+  @Prop({ type: String, default: null })
+  rt: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
