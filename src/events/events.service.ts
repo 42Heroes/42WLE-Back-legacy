@@ -7,6 +7,7 @@ import { ChatService } from 'src/chat/chat.service';
 import { SendMessageDto } from 'src/chat/dto/sendMessage.dto';
 import { MessageDocument } from 'src/schemas/message/message.schema';
 import { userMap } from './userMap';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EventsService {
@@ -14,6 +15,7 @@ export class EventsService {
     private readonly jwtService: JwtService,
     private readonly userService: UserService,
     private readonly chatService: ChatService,
+    private readonly configService: ConfigService,
   ) {}
 
   async createRoom(socket: Socket, targetUserId: string) {
@@ -74,7 +76,9 @@ export class EventsService {
     const bearerToken = token?.split(' ')[1];
 
     try {
-      const decode = this.jwtService.verify(bearerToken, { secret: 'gamguma' });
+      const decode = this.jwtService.verify(bearerToken, {
+        secret: this.configService.get<string>('JWT_AT_SECRET'),
+      });
 
       socket.data.authenticate = true;
       socket.data.id = decode.id;
