@@ -1,9 +1,10 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Board } from 'src/schemas/board/board.schema';
 import { BoardService } from './board.service';
-import { BoardDto } from './dto/create-board.dto';
+import { CreateBoardDto } from './dto/create-board.dto';
+import { DeleteBoardDto } from './dto/delete-board.dto';
 
 @Controller('board')
 export class BoardController {
@@ -11,9 +12,18 @@ export class BoardController {
     private readonly boardService: BoardService,
     @InjectModel(Board.name) private boardModel: Model<Board>,
   ) {}
+  @Get()
+  async findAll(): Promise<Board[]> {
+    return this.boardService.findAllBoard();
+  }
 
-  @Post('create')
-  async createBoard(@Body() boardDto: BoardDto) {
-    this.createBoard(boardDto);
+  @Post()
+  async createBoard(@Body() createBoardDto: CreateBoardDto) {
+    console.log(createBoardDto.userId);
+    return this.boardService.createBoard(createBoardDto);
+  }
+  @Delete()
+  async deleteBoard(@Body() deleteBoardDto: DeleteBoardDto) {
+    return this.boardService.deleteBoard(deleteBoardDto);
   }
 }

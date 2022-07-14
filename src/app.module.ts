@@ -7,8 +7,6 @@ import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { EventsModule } from './events/events.module';
 import { ChatModule } from './chat/chat.module';
-import { BoardController } from './board/board.controller';
-import { BoardService } from './board/board.service';
 import { BoardModule } from './board/board.module';
 
 @Module({
@@ -24,7 +22,7 @@ import { BoardModule } from './board/board.module';
     ChatModule,
     BoardModule,
   ],
-  controllers: [AppController, BoardController],
-  providers: [AppService, BoardService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

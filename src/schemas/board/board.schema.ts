@@ -2,12 +2,10 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Comment } from '../comment/comment.schema';
 import { User } from '../user/user.schema';
+import { boardContents } from 'src/interface/board/boardContent.interface';
 
 export type BoardDocument = Board & Document;
-interface boardContents {
-  text: string;
-  img: string[];
-}
+
 @Schema()
 export class Board {
   @Prop({ required: true, default: Date.now })
@@ -18,14 +16,13 @@ export class Board {
 
   @Prop({
     required: true,
-    type: [
-      { type: mongoose.Schema.Types.ObjectId, ref: 'User', autopopulate: true },
-    ],
+    type: mongoose.Schema.Types.ObjectId,
   })
   user: User;
 
   @Prop({
     required: true,
+    type: Object,
   })
   contents: boardContents;
 
