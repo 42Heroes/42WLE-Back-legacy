@@ -52,7 +52,7 @@ export class User {
   posts: Post[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Board' }] })
-  board: Board[];
+  board: BoardDocument[];
 
   @Prop()
   n_language: string[];

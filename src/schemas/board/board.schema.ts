@@ -18,7 +18,7 @@ export class Board {
     required: true,
     type: mongoose.Schema.Types.ObjectId,
   })
-  user: User;
+  author: User;
 
   @Prop({
     required: true,

@@ -5,6 +5,7 @@ import { Board } from 'src/schemas/board/board.schema';
 import { UserService } from 'src/user/user.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { DeleteBoardDto } from './dto/delete-board.dto';
+import { UpdateBoardDto } from './dto/update-boadr.dto';
 
 @Injectable()
 export class BoardService {
@@ -14,20 +15,21 @@ export class BoardService {
   ) {}
 
   async createBoard(createBoardDto: CreateBoardDto): Promise<boolean> {
-    const user = await await this.userService.getOneUser(createBoardDto.userId);
+    const author = await await this.userService.getOneUser(
+      createBoardDto.userId,
+    );
     try {
       const board = new this.boardModel({
-        user,
+        author,
         contents: createBoardDto.contents,
       });
-      user.board.push(board);
-      console.log(user.board);
-      await user.save();
+      author.board.push(board);
+      console.log(author.board);
+      await author.save();
       await board.save();
       return true;
     } catch (error) {
       throw new HttpException(error, 501);
-      // return false;
     }
   }
 
@@ -35,13 +37,28 @@ export class BoardService {
     return this.boardModel.find().exec();
   }
 
-  async deleteBoard(deleteBoardDto: DeleteBoardDto) {
-    const user = await this.userService.getOneUser(deleteBoardDto.userId);
-    const board = await this.boardModel.findByIdAndDelete(
-      deleteBoardDto.boardid,
-    );
-    // user.board.for
+  async deleteBoard(deleteBoardDto: DeleteBoardDto): Promise<boolean> {
+    try {
+      const author = await (
+        await this.userService.getOneUser(deleteBoardDto.userId)
+      ).update({ $pull: { board: deleteBoardDto.boardId } });
+      await this.boardModel.findByIdAndDelete(deleteBoardDto.boardId);
+      await author.save();
+      return true;
+    } catch (error) {
+      throw new HttpException(error, 501);
+    }
+  }
 
-    return true;
+  async updateBoard(updateBoardDto: UpdateBoardDto) {
+    try {
+      await this.boardModel.findByIdAndUpdate(
+        { _id: updateBoardDto.boardId },
+        { contents: updateBoardDto.contents },
+      );
+      return true;
+    } catch (error) {
+      throw new HttpException(error, 501);
+    }
   }
 }
