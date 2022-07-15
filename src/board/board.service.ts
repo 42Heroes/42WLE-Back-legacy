@@ -15,6 +15,7 @@ export class BoardService {
   ) {}
 
   async createBoard(createBoardDto: CreateBoardDto): Promise<boolean> {
+    //TODO: jwt token 이용해서 userId 가져오기
     const author = await await this.userService.getOneUser(
       createBoardDto.userId,
     );
@@ -24,7 +25,6 @@ export class BoardService {
         contents: createBoardDto.contents,
       });
       author.board.push(board);
-      console.log(author.board);
       await author.save();
       await board.save();
       return true;
