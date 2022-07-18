@@ -7,6 +7,7 @@ import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { EventsModule } from './events/events.module';
 import { ChatModule } from './chat/chat.module';
+import { BoardModule } from './board/board.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ChatModule } from './chat/chat.module';
     AuthModule,
     EventsModule,
     ChatModule,
+    BoardModule,
   ],
   controllers: [AppController],
   providers: [AppService],

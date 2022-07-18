@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { WsException } from '@nestjs/websockets';
 import { Model } from 'mongoose';
@@ -70,7 +70,8 @@ export class ChatService {
       return newChatRoom;
     } catch (error) {
       console.log(error);
-      return;
+      throw new HttpException(error, 501);
+      // return;
     }
   }
 }

@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
 import { ChatRoomDocument } from 'src/schemas/chatRoom/chatRoom.schema';
 import { Post } from 'src/schemas/post/post.schema';
+import { Board, BoardDocument } from 'src/schemas/board/board.schema';
 
 export type UserDocument = User & mongoose.Document;
 
@@ -49,6 +50,9 @@ export class User {
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
   posts: Post[];
+
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Board' }] })
+  board: BoardDocument[];
 
   @Prop()
   n_language: string[];
