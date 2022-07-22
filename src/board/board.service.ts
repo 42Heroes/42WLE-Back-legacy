@@ -63,14 +63,14 @@ export class BoardService {
     }
   }
 
-  async likeBoard(userId: string, boardId: string) {
+  async likeBoard(userId: string, boardId: string): Promise<any> {
     try {
       const user = await this.userService.getOneUser(userId);
       const board = await this.boardModel.findById(boardId);
       board.likedUsers.push(user.nickname);
       await user.save();
       await board.save();
-      return true;
+      return board.likedUsers;
     } catch (error) {
       throw new HttpException(error, 501);
     }
