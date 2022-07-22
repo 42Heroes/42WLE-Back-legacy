@@ -14,11 +14,12 @@ export class BoardService {
     readonly userService: UserService,
   ) {}
 
-  async createBoard(createBoardDto: CreateBoardDto): Promise<boolean> {
+  async createBoard(
+    userId: string,
+    createBoardDto: CreateBoardDto,
+  ): Promise<boolean> {
     //TODO: jwt token 이용해서 userId 가져오기
-    const author = await await this.userService.getOneUser(
-      createBoardDto.userId,
-    );
+    const author = await this.userService.getOneUser(userId);
     try {
       const board = new this.boardModel({
         author,
