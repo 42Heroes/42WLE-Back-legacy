@@ -13,6 +13,7 @@ import { UpdateBoardDto } from './dto/update-boadr.dto';
 export class BoardService {
   constructor(
     @InjectModel(Board.name) private boardModel: Model<Board>,
+    @InjectModel(Comment.name) private commentModel: Model<Comment>,
     readonly userService: UserService,
   ) {}
 
@@ -86,12 +87,13 @@ export class BoardService {
     try {
       const author = await this.userService.getOneUser(userId);
       const board = await this.boardModel.findById(commentBoardDto.boardId);
-      // const comment = new this.commentModel({
-      //   author,
-      //   content: commentBoardDto.content,
-      // });
-      board.comments.push();
+      const comment = new this.commentModel({
+        author,
+        content: commentBoardDto.content,
+      });
+      board.comments.push(comment);
       await board.save();
+      await comment.save();
       return board.comments;
     } catch (error) {
       throw new HttpException(error, 501);
