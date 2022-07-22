@@ -4,7 +4,8 @@ import { Model } from 'mongoose';
 import { Board } from 'src/schemas/board/board.schema';
 import { Comment } from 'src/schemas/comment/comment.schema';
 import { UserService } from 'src/user/user.service';
-import { CommentBoardDto } from './dto/comment-board.dto';
+import { CommentCreateDto } from './dto/comment-create.dto';
+import { CommentUpdateDto } from './dto/comment-update.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { DeleteBoardDto } from './dto/delete-board.dto';
 import { UpdateBoardDto } from './dto/update-boadr.dto';
@@ -83,13 +84,13 @@ export class BoardService {
       throw new HttpException(error, 501);
     }
   }
-  async createBoardComment(userId: string, commentBoardDto: CommentBoardDto) {
+  async createBoardComment(userId: string, commentCreateDto: CommentCreateDto) {
     try {
       const author = await this.userService.getOneUser(userId);
-      const board = await this.boardModel.findById(commentBoardDto.boardId);
+      const board = await this.boardModel.findById(commentCreateDto.boardId);
       const comment = new this.commentModel({
         author,
-        content: commentBoardDto.content,
+        content: commentCreateDto.content,
       });
       board.comments.push(comment);
       await board.save();
@@ -131,6 +132,22 @@ export class BoardService {
       await board.save();
       await comment.remove();
       return board.comments;
+    } catch (error) {
+      throw new HttpException(error, 501);
+    }
+  }
+
+  async updateBoardComment(userId: string, commentUpdateDto: CommentUpdateDto) {
+    try {
+      const comment = await this.commentModel.findById(
+        commentUpdateDto.commentId,
+      );
+      if (comment.author.id !== userId) {
+        throw new HttpException('수정 권한이 없습니다.', 401);
+      }
+      comment.content = commentUpdateDto.content;
+      await comment.save();
+      return comment;
     } catch (error) {
       throw new HttpException(error, 501);
     }

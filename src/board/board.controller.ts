@@ -6,6 +6,7 @@ import {
   Get,
   Post,
   Put,
+  Patch,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -13,7 +14,8 @@ import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { Board } from 'src/schemas/board/board.schema';
 import { BoardService } from './board.service';
-import { CommentBoardDto } from './dto/comment-board.dto';
+import { CommentCreateDto } from './dto/comment-create.dto';
+import { CommentUpdateDto } from './dto/comment-update.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { DeleteBoardDto } from './dto/delete-board.dto';
 import { UpdateBoardDto } from './dto/update-boadr.dto';
@@ -59,9 +61,9 @@ export class BoardController {
   @UseGuards(JwtAuthGuard)
   async createBoardComment(
     @GetUser('id') id: string,
-    @Body() commentBoardDto: CommentBoardDto,
+    @Body() commentCreateDto: CommentCreateDto,
   ) {
-    return this.boardService.createBoardComment(id, commentBoardDto);
+    return this.boardService.createBoardComment(id, commentCreateDto);
   }
 
   @Post('comment/like')
@@ -81,5 +83,14 @@ export class BoardController {
     @Body('boardId') boardId: string,
   ) {
     return this.boardService.deleteBoardComment(id, commentId, boardId);
+  }
+
+  @Patch('comment')
+  @UseGuards(JwtAuthGuard)
+  async updateBoardComment(
+    @GetUser('id') id: string,
+    @Body() commentUpdateDto: CommentUpdateDto,
+  ) {
+    return this.boardService.updateBoardComment(id, commentUpdateDto);
   }
 }

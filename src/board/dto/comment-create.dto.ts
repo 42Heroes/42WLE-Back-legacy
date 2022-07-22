@@ -1,5 +1,5 @@
 import { IsString } from 'class-validator';
-export class CommentBoardDto {
+export class CommentCreateDto {
   @IsString()
   boardId: string;
 
