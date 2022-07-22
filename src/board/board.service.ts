@@ -117,4 +117,22 @@ export class BoardService {
       throw new HttpException(error, 501);
     }
   }
+
+  async deleteBoardComment(userId: string, commentId: string, boardId: string) {
+    try {
+      const comment = await this.commentModel.findById(commentId);
+      if (comment.author.id !== userId) {
+        throw new HttpException('삭제 권한이 없습니다.', 401);
+      }
+      const board = await this.boardModel.findById(boardId);
+      const index = board.comments.indexOf(comment.id);
+      //TODO : comment의 comment 삭제
+      board.comments.splice(index, 1);
+      await board.save();
+      await comment.remove();
+      return board.comments;
+    } catch (error) {
+      throw new HttpException(error, 501);
+    }
+  }
 }

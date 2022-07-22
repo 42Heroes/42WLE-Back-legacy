@@ -72,4 +72,14 @@ export class BoardController {
   ) {
     return this.boardService.likeBoardComment(id, commentId);
   }
+
+  @Delete('comment')
+  @UseGuards(JwtAuthGuard)
+  async deleteBoardComment(
+    @GetUser('id') id: string,
+    @Body('commentId') commentId: string,
+    @Body('boardId') boardId: string,
+  ) {
+    return this.boardService.deleteBoardComment(id, commentId, boardId);
+  }
 }
