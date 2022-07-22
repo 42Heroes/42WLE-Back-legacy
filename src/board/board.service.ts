@@ -62,4 +62,17 @@ export class BoardService {
       throw new HttpException(error, 501);
     }
   }
+
+  async likeBoard(userId: string, boardId: string) {
+    try {
+      const user = await this.userService.getOneUser(userId);
+      const board = await this.boardModel.findById(boardId);
+      board.likedUsers.push(user.nickname);
+      await user.save();
+      await board.save();
+      return true;
+    } catch (error) {
+      throw new HttpException(error, 501);
+    }
+  }
 }
