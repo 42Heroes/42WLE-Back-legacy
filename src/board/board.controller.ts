@@ -91,6 +91,6 @@ export class BoardController {
     @GetUser('id') id: string,
     @Body() commentUpdateDto: CommentUpdateDto,
   ) {
-    return this.boardService.updateBoardComment(id, commentUpdateDto);
+    this.boardService.updateBoardComment(id, commentUpdateDto);
   }
 }

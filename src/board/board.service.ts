@@ -146,8 +146,8 @@ export class BoardService {
         throw new HttpException('수정 권한이 없습니다.', 401);
       }
       comment.content = commentUpdateDto.content;
+      comment.updatedAt = new Date();
       await comment.save();
-      return comment;
     } catch (error) {
       throw new HttpException(error, 501);
     }
