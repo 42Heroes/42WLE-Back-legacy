@@ -6,10 +6,10 @@ export type ChatRoomDocument = ChatRoom & mongoose.Document;
 
 @Schema()
 export class ChatRoom {
-  @Prop({ required: true, default: new Date() })
+  @Prop({ required: true, default: Date.now })
   createdAt: Date;
 
-  @Prop({ required: true, default: new Date() })
+  @Prop({ required: true, default: Date.now })
   updatedAt: Date;
 
   @Prop({

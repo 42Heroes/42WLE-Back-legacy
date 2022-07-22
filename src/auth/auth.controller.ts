@@ -26,7 +26,6 @@ export class AuthController {
     res.cookie('refresh-token', tokens.refreshToken, {
       httpOnly: true,
     });
-
     return tokens.accessToken;
   }
 

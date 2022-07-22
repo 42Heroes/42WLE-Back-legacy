@@ -18,7 +18,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 
 @Controller('users')
 export class UserController {
@@ -31,7 +31,7 @@ export class UserController {
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
-  async getMyInfo(@GetUser() user: UserDocument, @Req() req: Request) {
+  async getMyInfo(@GetUser() user: UserDocument) {
     return this.userService.getOneUser(user.id);
   }
 

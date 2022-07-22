@@ -27,7 +27,7 @@ export class Message {
   @Prop({ required: true })
   content: string;
 
-  @Prop({ required: true, default: new Date() })
+  @Prop({ required: true, default: Date.now })
   createdAt: Date;
 }
 

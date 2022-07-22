@@ -22,7 +22,7 @@ export class Post {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }] })
   comments: Comment[];
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: Date.now })
   createdAt: Date;
 
   @Prop()
