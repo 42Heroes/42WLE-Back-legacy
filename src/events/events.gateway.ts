@@ -14,6 +14,7 @@ import { WsGuard } from 'src/auth/auth.guard';
 import { SendMessageDto } from 'src/chat/dto/sendMessage.dto';
 import { SocketEvents } from './event.enum';
 import { EventsService } from './events.service';
+import { roomMap } from './roomMap';
 import { userMap } from './userMap';
 
 @WebSocketGateway({ cors: true })
@@ -26,6 +27,135 @@ export class EventsGateway
 
   afterInit(server: Server) {
     console.log('webSocketServerInit');
+  }
+
+  @SubscribeMessage(SocketEvents.RequestCall)
+  handleRequestCall(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() roomNo: string,
+  ) {
+    console.log('RequestCall', roomNo);
+    if (roomMap[roomNo]) {
+      const isExistUser = roomMap[roomNo].find(
+        (user) => user.socketId === socket.id,
+      );
+      if (!isExistUser) {
+        roomMap[roomNo].push({ socketId: socket.id, id: socket.data.intra_id });
+      }
+    } else {
+      roomMap[roomNo] = [{ socketId: socket.id, id: socket.data.intra_id }];
+    }
+    socket.data.currentRoom = roomNo;
+    console.log(roomMap[roomNo]);
+    socket.to(roomNo).emit(SocketEvents.RequestCall, { roomNo });
+    return '성공적으로 요청함';
+  }
+
+  @SubscribeMessage(SocketEvents.AcceptCall)
+  handleAcceptCall(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() roomNo: string,
+  ) {
+    console.log('AcceptCall', roomNo, socket.data.intra_id);
+    let result = {};
+    if (roomMap[roomNo]) {
+      const existUser = roomMap[roomNo].find(
+        (user) => user.socketId === socket.id,
+      );
+      if (!existUser) {
+        roomMap[roomNo].push({ socketId: socket.id, id: socket.data.intra_id });
+      }
+      result = roomMap[roomNo].filter((user) => user.socketId !== socket.id);
+    } else {
+      result = roomMap[roomNo] = [
+        { socketId: socket.id, id: socket.data.intra_id },
+      ];
+    }
+    console.log('roomMap', roomMap);
+    socket.data.currentRoom = roomNo;
+    this.server.to(socket.id).emit(SocketEvents.AcceptCall, result);
+    return '잘 받았슴둥';
+  }
+
+  @SubscribeMessage(SocketEvents.RejectCall)
+  handleRejectCall(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() roomNo: string,
+  ) {
+    return socket.to(roomNo).emit(SocketEvents.RejectCall, { roomNo });
+  }
+
+  @SubscribeMessage(SocketEvents.CancelCall)
+  handleCancelCall(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() roomNo: string,
+  ) {
+    return socket.to(roomNo).emit(SocketEvents.CancelCall, { roomNo });
+  }
+
+  @SubscribeMessage(SocketEvents.EndCall)
+  handleEndCall(@ConnectedSocket() socket: Socket) {
+    console.log('EndCall', socket.data.currentRoom, socket.data.intra_id);
+    if (roomMap[socket.data?.currentRoom]) {
+      roomMap[socket.data.currentRoom] = roomMap[
+        socket.data.currentRoom
+      ].filter((user) => user.socketId !== socket.id);
+      const payload = {
+        roomNo: socket.data.currentRoom,
+        socketId: socket.id,
+      };
+      if (roomMap[socket.data.currentRoom].length === 0) {
+        socket
+          .to(socket.data.currentRoom)
+          .emit(SocketEvents.CancelCall, payload);
+        return { roomId: socket.data.currentRoom, status: 'cancel' };
+      } else {
+        socket.to(socket.data.currentRoom).emit(SocketEvents.ExitUser, payload);
+      }
+    }
+    console.log('roomMap', roomMap);
+    return { roomId: socket.data.currentRoom, status: 'end' };
+  }
+
+  @SubscribeMessage(SocketEvents.Offer)
+  handleRTCOffer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('offer') offer: RTCSessionDescriptionInit,
+    @MessageBody('offerReceiverId') offerReceiverId: string,
+  ) {
+    console.log('Offer', offerReceiverId);
+    socket
+      .to(offerReceiverId)
+      .emit(SocketEvents.Offer, { offer, offerSenderId: socket.id });
+    return 'hi';
+  }
+
+  @SubscribeMessage(SocketEvents.Answer)
+  handleRTCAnswer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('answer') answer: RTCSessionDescriptionInit,
+    @MessageBody('answerReceiverId') answerReceiverId: string,
+  ) {
+    console.log('Answer', answerReceiverId);
+    console.log('Answer', socket.id);
+    socket
+      .to(answerReceiverId)
+      .emit(SocketEvents.Answer, { answer, answerSenderId: socket.id });
+    return 'hi';
+  }
+
+  @SubscribeMessage(SocketEvents.IceCandidate)
+  handleIceCandidate(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('candidate') candidate: any,
+    @MessageBody('candidateReceiverId') candidateReceiverId: string,
+  ) {
+    console.log('IceCandidate', candidateReceiverId);
+    socket.to(candidateReceiverId).emit(SocketEvents.IceCandidate, {
+      candidate,
+      candidateSenderId: socket.id,
+    });
+    return 'hi';
   }
 
   // * 메시지
@@ -71,7 +201,17 @@ export class EventsGateway
 
   // * 소켓 연결 끊겼을 때
   handleDisconnect(@ConnectedSocket() socket: Socket) {
+    if (roomMap[socket.data?.currentRoom]) {
+      roomMap[socket.data.currentRoom] = roomMap[
+        socket.data.currentRoom
+      ].filter((user) => user.socketId !== socket.id);
+      socket.to(socket.data.currentRoom).emit(SocketEvents.ExitUser, {
+        roomNo: socket.data.currentRoom,
+        socketId: socket.id,
+      });
+    }
     userMap.delete(socket.data.intra_id);
+    console.log(roomMap, userMap);
     console.log('disconnected', socket.nsp.name);
   }
 }
