@@ -67,7 +67,12 @@ export class BoardService {
     try {
       const user = await this.userService.getOneUser(userId);
       const board = await this.boardModel.findById(boardId);
-      board.likedUsers.push(user.nickname);
+      const isExist = board.likedUsers.indexOf(user.nickname);
+      if (isExist === -1) {
+        board.likedUsers.push(user.nickname);
+      } else {
+        board.likedUsers.splice(isExist, 1);
+      }
       await user.save();
       await board.save();
       return board.likedUsers;
