@@ -21,7 +21,7 @@ export class Comment {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   })
-  likes: User[];
+  likedUsers: User[];
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],

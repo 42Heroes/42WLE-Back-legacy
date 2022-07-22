@@ -99,4 +99,22 @@ export class BoardService {
       throw new HttpException(error, 501);
     }
   }
+
+  async likeBoardComment(userId: string, commentId: string) {
+    try {
+      const user = await this.userService.getOneUser(userId);
+      const comment = await this.commentModel.findById(commentId);
+      const isExist = comment.likedUsers.indexOf(user);
+      if (isExist === -1) {
+        comment.likedUsers.push(user);
+      } else {
+        comment.likedUsers.splice(isExist, 1);
+      }
+      await user.save();
+      await comment.save();
+      return comment.likedUsers;
+    } catch (error) {
+      throw new HttpException(error, 501);
+    }
+  }
 }
