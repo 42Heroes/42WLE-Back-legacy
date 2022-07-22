@@ -39,6 +39,7 @@ export class AuthService {
     user.rt = await bcrypt.hash(tokens.refreshToken, 10);
     // TODO: 누군가 탈취해서 우리코드로 보내면 뚫리는거 아닌가? hash가 소용있나?
     await user.save();
+    console.log(tokens);
     return { tokens };
   }
 
@@ -58,7 +59,7 @@ export class AuthService {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.config.get<string>('JWT_AT_SECRET'),
-        expiresIn: 60 * 15,
+        expiresIn: 60 * 60 * 24 * 15,
       }),
       this.jwtService.signAsync(payload, {
         secret: this.config.get<string>('JWT_RT_SECRET'),

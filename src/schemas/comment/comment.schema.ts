@@ -1,18 +1,18 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import * as mongoose from 'mongoose';
-import { User } from 'src/schemas/user/user.schema';
+import { User, UserDocument } from 'src/schemas/user/user.schema';
 
-export type CommentDocument = Comment & Document;
+export type CommentDocument = Comment & mongoose.Document;
 
 @Schema()
 export class Comment {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  author: User;
+  author: UserDocument;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: Date.now })
   createdAt: Date;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: Date.now })
   updatedAt: Date;
 
   @Prop({ required: true })
@@ -21,7 +21,7 @@ export class Comment {
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   })
-  likes: User[];
+  likedUsers: User[];
 
   @Prop({
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }],
