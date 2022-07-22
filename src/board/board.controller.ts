@@ -47,4 +47,10 @@ export class BoardController {
   async updateBoard(@Body() updateBoardDto: UpdateBoardDto) {
     return this.boardService.updateBoard(updateBoardDto);
   }
+
+  @Post('like')
+  @UseGuards(JwtAuthGuard)
+  async likeBoard(@GetUser('id') id: string, @Body('boardId') boardId: string) {
+    return this.boardService.likeBoard(id, boardId);
+  }
 }
