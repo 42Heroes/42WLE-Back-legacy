@@ -13,6 +13,7 @@ import { JwtAuthGuard } from 'src/auth/auth.guard';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { Board } from 'src/schemas/board/board.schema';
 import { BoardService } from './board.service';
+import { CommentBoardDto } from './dto/comment-board.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { DeleteBoardDto } from './dto/delete-board.dto';
 import { UpdateBoardDto } from './dto/update-boadr.dto';
@@ -52,5 +53,14 @@ export class BoardController {
   @UseGuards(JwtAuthGuard)
   async likeBoard(@GetUser('id') id: string, @Body('boardId') boardId: string) {
     return this.boardService.likeBoard(id, boardId);
+  }
+
+  @Post('comment')
+  @UseGuards(JwtAuthGuard)
+  async createBoardComment(
+    @GetUser('id') id: string,
+    @Body() commentBoardDto: CommentBoardDto,
+  ) {
+    return this.boardService.createBoardComment(id, commentBoardDto);
   }
 }
