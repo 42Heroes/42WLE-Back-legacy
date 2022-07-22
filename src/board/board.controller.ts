@@ -63,4 +63,13 @@ export class BoardController {
   ) {
     return this.boardService.createBoardComment(id, commentBoardDto);
   }
+
+  @Post('comment/like')
+  @UseGuards(JwtAuthGuard)
+  async likeBoardComment(
+    @GetUser('id') id: string,
+    @Body('commentId') commentId: string,
+  ) {
+    return this.boardService.likeBoardComment(id, commentId);
+  }
 }
