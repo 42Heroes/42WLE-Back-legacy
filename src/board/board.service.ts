@@ -2,7 +2,9 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Board } from 'src/schemas/board/board.schema';
+import { Comment } from 'src/schemas/comment/comment.schema';
 import { UserService } from 'src/user/user.service';
+import { CommentBoardDto } from './dto/comment-board.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { DeleteBoardDto } from './dto/delete-board.dto';
 import { UpdateBoardDto } from './dto/update-boadr.dto';
@@ -76,6 +78,21 @@ export class BoardService {
       await user.save();
       await board.save();
       return board.likedUsers;
+    } catch (error) {
+      throw new HttpException(error, 501);
+    }
+  }
+  async createBoardComment(userId: string, commentBoardDto: CommentBoardDto) {
+    try {
+      const author = await this.userService.getOneUser(userId);
+      const board = await this.boardModel.findById(commentBoardDto.boardId);
+      // const comment = new this.commentModel({
+      //   author,
+      //   content: commentBoardDto.content,
+      // });
+      board.comments.push();
+      await board.save();
+      return board.comments;
     } catch (error) {
       throw new HttpException(error, 501);
     }

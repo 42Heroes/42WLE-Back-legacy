@@ -38,7 +38,7 @@ export class Board {
       },
     ],
   })
-  comment: Comment;
+  comments: Comment[];
 }
 
 export const BoardSchema = SchemaFactory.createForClass(Board);

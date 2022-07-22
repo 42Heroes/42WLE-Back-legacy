@@ -9,10 +9,10 @@ export class Comment {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
   author: User;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: Date.now })
   createdAt: Date;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: Date.now })
   updatedAt: Date;
 
   @Prop({ required: true })
