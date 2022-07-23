@@ -71,15 +71,15 @@ export class BoardService {
     try {
       const user = await this.userService.getOneUser(userId);
       const board = await this.boardModel.findById(boardId);
-      const isExist = board.likedUsers.indexOf(user.nickname);
+      const isExist = board.likes.indexOf(user.id);
       if (isExist === -1) {
-        board.likedUsers.push(user.nickname);
+        board.likes.push(user.id);
       } else {
-        board.likedUsers.splice(isExist, 1);
+        board.likes.splice(isExist, 1);
       }
       await user.save();
       await board.save();
-      return board.likedUsers;
+      return board.likes;
     } catch (error) {
       throw new HttpException(error, 501);
     }

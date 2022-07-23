@@ -26,8 +26,16 @@ export class Board {
   })
   contents: boardContents;
 
-  @Prop()
-  likedUsers: string[];
+  @Prop({
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        autopopulate: true,
+      },
+    ],
+  })
+  likes: User[];
 
   @Prop({
     type: [
