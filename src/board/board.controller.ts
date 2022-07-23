@@ -41,8 +41,11 @@ export class BoardController {
   }
   @Delete()
   @UseGuards(JwtAuthGuard)
-  async deleteBoard(@Body() deleteBoardDto: DeleteBoardDto) {
-    return this.boardService.deleteBoard(deleteBoardDto);
+  async deleteBoard(
+    @GetUser('id') id: string,
+    @Body('boardId') boardId: string,
+  ) {
+    return this.boardService.deleteBoard(id, boardId);
   }
 
   @Put()
@@ -69,10 +72,10 @@ export class BoardController {
   @Post('comment/like')
   @UseGuards(JwtAuthGuard)
   async likeBoardComment(
-    @GetUser('id') id: string,
+    @GetUser('id') userId: string,
     @Body('commentId') commentId: string,
   ) {
-    return this.boardService.likeBoardComment(id, commentId);
+    return this.boardService.likeBoardComment(userId, commentId);
   }
 
   @Delete('comment')

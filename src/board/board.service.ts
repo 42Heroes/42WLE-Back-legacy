@@ -22,7 +22,6 @@ export class BoardService {
     userId: string,
     createBoardDto: CreateBoardDto,
   ): Promise<boolean> {
-    //TODO: jwt token 이용해서 userId 가져오기
     const author = await this.userService.getOneUser(userId);
     try {
       const board = new this.boardModel({
@@ -42,12 +41,26 @@ export class BoardService {
     return this.boardModel.find().exec();
   }
 
-  async deleteBoard(deleteBoardDto: DeleteBoardDto): Promise<boolean> {
+  async deleteBoardComments(comments: Comment[]) {
+    console.log(comments);
+    // if (comments.length === 0) {
+    //   return;
+    // }
+    // comments.forEach(async (comment) => {
+    //   if (comment.comments.length !== 0) {
+    //     await this.deleteBoardComment(comment.comments);
+    //   }
+    //   comment.remove();
+    // }
+  }
+
+  async deleteBoard(userId: string, boardId: string): Promise<boolean> {
     try {
       const author = await (
-        await this.userService.getOneUser(deleteBoardDto.userId)
-      ).update({ $pull: { board: deleteBoardDto.boardId } });
-      await this.boardModel.findByIdAndDelete(deleteBoardDto.boardId);
+        await this.userService.getOneUser(userId)
+      ).update({ $pull: { board: boardId } });
+      const board = await this.boardModel.findById(boardId);
+      this.deleteBoardComments(board.comments);
       await author.save();
       return true;
     } catch (error) {
