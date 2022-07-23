@@ -29,28 +29,19 @@ export class UserController {
     return this.userService.getAllUser();
   }
 
-  @Patch('/register')
-  @UseGuards(JwtAuthGuard)
-  async updateUser(
-    @GetUser('id') userId: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.userService.updateUser(updateUserDto, userId);
-  }
-
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getMyInfo(@GetUser() user: UserDocument) {
     return this.userService.getOneUser(user.id);
   }
 
-  @Put('/me')
+  @Patch('/me')
   @UseGuards(JwtAuthGuard)
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
-    @GetUser() user: UserDocument,
+    @GetUser('id') userId: string,
   ) {
-    return this.userService.updateUser(updateUserDto, user.id);
+    return this.userService.updateUser(updateUserDto, userId);
   }
 
   @Patch('/me/profile')
