@@ -29,6 +29,15 @@ export class UserController {
     return this.userService.getAllUser();
   }
 
+  @Patch('/register')
+  @UseGuards(JwtAuthGuard)
+  async updateUser(
+    @GetUser('id') userId: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.updateUser(updateUserDto, userId);
+  }
+
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getMyInfo(@GetUser() user: UserDocument) {

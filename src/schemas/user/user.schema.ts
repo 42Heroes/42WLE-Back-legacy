@@ -23,8 +23,7 @@ export class User {
   @Prop()
   campus: string;
 
-  // @Prop({ required: true })
-  @Prop()
+  @Prop({ required: true, default: Date.now })
   createdAt: Date;
 
   @Prop([String])
@@ -48,9 +47,6 @@ export class User {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
   saved_posts: Post[];
 
-  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Post' }] })
-  posts: Post[];
-
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Board' }] })
   board: BoardDocument[];
 
@@ -62,7 +58,7 @@ export class User {
   l_language: string[];
 
   // @Prop({ required: true })
-  @Prop({ type: Date, default: new Date() })
+  @Prop({ type: Date })
   join_date: Date;
 
   @Prop({ type: Boolean, default: false })
