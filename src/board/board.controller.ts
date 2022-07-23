@@ -17,7 +17,6 @@ import { BoardService } from './board.service';
 import { CommentCreateDto } from './dto/comment-create.dto';
 import { CommentUpdateDto } from './dto/comment-update.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
-import { DeleteBoardDto } from './dto/delete-board.dto';
 import { UpdateBoardDto } from './dto/update-boadr.dto';
 
 @Controller('board')

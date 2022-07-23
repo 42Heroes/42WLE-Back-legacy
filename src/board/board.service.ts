@@ -7,7 +7,6 @@ import { UserService } from 'src/user/user.service';
 import { CommentCreateDto } from './dto/comment-create.dto';
 import { CommentUpdateDto } from './dto/comment-update.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
-import { DeleteBoardDto } from './dto/delete-board.dto';
 import { UpdateBoardDto } from './dto/update-boadr.dto';
 
 @Injectable()
@@ -41,26 +40,12 @@ export class BoardService {
     return this.boardModel.find().exec();
   }
 
-  async deleteBoardComments(comments: Comment[]) {
-    console.log(comments);
-    // if (comments.length === 0) {
-    //   return;
-    // }
-    // comments.forEach(async (comment) => {
-    //   if (comment.comments.length !== 0) {
-    //     await this.deleteBoardComment(comment.comments);
-    //   }
-    //   comment.remove();
-    // }
-  }
-
   async deleteBoard(userId: string, boardId: string): Promise<boolean> {
     try {
       const author = await (
         await this.userService.getOneUser(userId)
       ).update({ $pull: { board: boardId } });
       const board = await this.boardModel.findById(boardId);
-      this.deleteBoardComments(board.comments);
       await author.save();
       return true;
     } catch (error) {
