@@ -127,10 +127,11 @@ export class BoardService {
       }
       const board = await this.boardModel.findById(boardId);
       const index = board.comments.indexOf(comment.id);
-      //TODO : comment의 comment 삭제
       board.comments.splice(index, 1);
+      comment.isDeleted = true;
+      comment.content = 'This comment is deleted';
       await board.save();
-      await comment.remove();
+      await comment.save();
       return board.comments;
     } catch (error) {
       throw new HttpException(error, 501);
