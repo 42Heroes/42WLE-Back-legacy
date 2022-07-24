@@ -7,7 +7,6 @@ import { UserService } from 'src/user/user.service';
 import { CommentCreateDto } from './dto/comment-create.dto';
 import { CommentUpdateDto } from './dto/comment-update.dto';
 import { CreateBoardDto } from './dto/create-board.dto';
-import { DeleteBoardDto } from './dto/delete-board.dto';
 import { UpdateBoardDto } from './dto/update-boadr.dto';
 
 @Injectable()
@@ -22,7 +21,6 @@ export class BoardService {
     userId: string,
     createBoardDto: CreateBoardDto,
   ): Promise<boolean> {
-    //TODO: jwt token 이용해서 userId 가져오기
     const author = await this.userService.getOneUser(userId);
     try {
       const board = new this.boardModel({
@@ -42,12 +40,12 @@ export class BoardService {
     return this.boardModel.find().exec();
   }
 
-  async deleteBoard(deleteBoardDto: DeleteBoardDto): Promise<boolean> {
+  async deleteBoard(userId: string, boardId: string): Promise<boolean> {
     try {
       const author = await (
-        await this.userService.getOneUser(deleteBoardDto.userId)
-      ).update({ $pull: { board: deleteBoardDto.boardId } });
-      await this.boardModel.findByIdAndDelete(deleteBoardDto.boardId);
+        await this.userService.getOneUser(userId)
+      ).update({ $pull: { board: boardId } });
+      const board = await this.boardModel.findById(boardId);
       await author.save();
       return true;
     } catch (error) {
@@ -71,15 +69,15 @@ export class BoardService {
     try {
       const user = await this.userService.getOneUser(userId);
       const board = await this.boardModel.findById(boardId);
-      const isExist = board.likedUsers.indexOf(user.nickname);
+      const isExist = board.likes.indexOf(user.id);
       if (isExist === -1) {
-        board.likedUsers.push(user.nickname);
+        board.likes.push(user.id);
       } else {
-        board.likedUsers.splice(isExist, 1);
+        board.likes.splice(isExist, 1);
       }
       await user.save();
       await board.save();
-      return board.likedUsers;
+      return board.likes;
     } catch (error) {
       throw new HttpException(error, 501);
     }
@@ -105,15 +103,15 @@ export class BoardService {
     try {
       const user = await this.userService.getOneUser(userId);
       const comment = await this.commentModel.findById(commentId);
-      const isExist = comment.likedUsers.indexOf(user);
+      const isExist = comment.likes.indexOf(user);
       if (isExist === -1) {
-        comment.likedUsers.push(user);
+        comment.likes.push(user);
       } else {
-        comment.likedUsers.splice(isExist, 1);
+        comment.likes.splice(isExist, 1);
       }
       await user.save();
       await comment.save();
-      return comment.likedUsers;
+      return comment.likes;
     } catch (error) {
       throw new HttpException(error, 501);
     }
@@ -127,10 +125,11 @@ export class BoardService {
       }
       const board = await this.boardModel.findById(boardId);
       const index = board.comments.indexOf(comment.id);
-      //TODO : comment의 comment 삭제
       board.comments.splice(index, 1);
+      comment.isDeleted = true;
+      comment.content = 'This comment is deleted';
       await board.save();
-      await comment.remove();
+      await comment.save();
       return board.comments;
     } catch (error) {
       throw new HttpException(error, 501);
