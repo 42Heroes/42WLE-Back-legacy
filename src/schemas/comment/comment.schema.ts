@@ -19,15 +19,9 @@ export class Comment {
   content: string;
 
   @Prop({
-    type: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        autopopulate: true,
-      },
-    ],
+    type: Array,
   })
-  likes: User[];
+  likes: string[];
 
   @Prop({
     type: [

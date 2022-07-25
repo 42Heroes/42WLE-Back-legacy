@@ -62,4 +62,7 @@ export class UpdateUserDto {
   @IsString()
   @Length(10, 500)
   introduction: string;
+
+  @IsString()
+  imgage_url: string;
 }

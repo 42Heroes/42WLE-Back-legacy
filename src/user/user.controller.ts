@@ -35,13 +35,13 @@ export class UserController {
     return this.userService.getOneUser(user.id);
   }
 
-  @Put('/me')
+  @Patch('/me')
   @UseGuards(JwtAuthGuard)
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
-    @GetUser() user: UserDocument,
+    @GetUser('id') userId: string,
   ) {
-    return this.userService.updateUser(updateUserDto, user.id);
+    return this.userService.updateUser(updateUserDto, userId);
   }
 
   @Patch('/me/profile')

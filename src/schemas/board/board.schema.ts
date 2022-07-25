@@ -17,6 +17,7 @@ export class Board {
   @Prop({
     required: true,
     type: mongoose.Schema.Types.ObjectId,
+    autopopulate: true,
   })
   author: User;
 
