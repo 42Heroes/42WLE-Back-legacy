@@ -46,6 +46,7 @@ export class BoardService {
         await this.userService.getOneUser(userId)
       ).update({ $pull: { board: boardId } });
       const board = await this.boardModel.findById(boardId);
+      //TODO: Comment에 boardID 추가, BoardID로 Comment 삭제
       await author.save();
       return true;
     } catch (error) {
@@ -103,9 +104,9 @@ export class BoardService {
     try {
       const user = await this.userService.getOneUser(userId);
       const comment = await this.commentModel.findById(commentId);
-      const isExist = comment.likes.indexOf(user);
+      const isExist = comment.likes.indexOf(user.nickname);
       if (isExist === -1) {
-        comment.likes.push(user);
+        comment.likes.push(user.nickname);
       } else {
         comment.likes.splice(isExist, 1);
       }
