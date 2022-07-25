@@ -37,7 +37,7 @@ export class BoardService {
   }
 
   async findAllBoard(): Promise<Board[]> {
-    return this.boardModel.find().exec();
+    return this.boardModel.find().sort({ updatedAt: -1 });
   }
 
   async deleteBoard(userId: string, boardId: string): Promise<boolean> {
