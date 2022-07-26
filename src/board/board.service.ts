@@ -47,7 +47,6 @@ export class BoardService {
       ).updateOne({ $pull: { board: boardId } });
       await this.commentModel.deleteMany({ board: boardId });
       await this.boardModel.findByIdAndDelete(boardId);
-      //TODO: Comment에 boardID 추가, BoardID로 Comment 삭제
       await author.save();
       return true;
     } catch (error) {
