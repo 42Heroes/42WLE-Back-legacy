@@ -2,6 +2,7 @@ import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule, Schema } from '@nestjs/mongoose';
 import { Board, BoardSchema } from 'src/schemas/board/board.schema';
 import { Comment, CommentSchema } from 'src/schemas/comment/comment.schema';
+import { User, UserSchema } from 'src/schemas/user/user.schema';
 import { UserModule } from 'src/user/user.module';
 import { BoardController } from './board.controller';
 import { BoardService } from './board.service';
@@ -10,9 +11,9 @@ import { BoardService } from './board.service';
   imports: [
     MongooseModule.forFeatureAsync([
       {
-        name: Board.name,
+        name: User.name,
         useFactory: () => {
-          const schema = BoardSchema;
+          const schema = UserSchema;
           schema.plugin(require('mongoose-autopopulate'));
           return schema;
         },
@@ -22,6 +23,13 @@ import { BoardService } from './board.service';
         useFactory: () => {
           const schema = CommentSchema;
           schema.plugin(require('mongoose-autopopulate'));
+          return schema;
+        },
+      },
+      {
+        name: Board.name,
+        useFactory: () => {
+          const schema = BoardSchema;
           return schema;
         },
       },
