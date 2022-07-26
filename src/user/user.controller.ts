@@ -1,18 +1,16 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   Patch,
   Put,
   UseGuards,
-  Req,
   Post,
   Res,
   HttpCode,
 } from '@nestjs/common';
-import { User, UserDocument } from '../schemas/user/user.schema';
+import { User } from '../schemas/user/user.schema';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/auth.guard';
@@ -31,11 +29,11 @@ export class UserController {
 
   @Get('/me')
   @UseGuards(JwtAuthGuard)
-  async getMyInfo(@GetUser() user: UserDocument) {
-    return this.userService.getOneUser(user.id);
+  async getMyInfo(@GetUser('id') userId: string) {
+    return this.userService.getOneUser(userId);
   }
 
-  @Patch('/me')
+  @Put('/me')
   @UseGuards(JwtAuthGuard)
   async updateUser(
     @Body() updateUserDto: UpdateUserDto,
@@ -47,39 +45,32 @@ export class UserController {
   @Patch('/me/profile')
   @UseGuards(JwtAuthGuard)
   async updateProfileImage(
-    @GetUser() user: UserDocument,
+    @GetUser('id') userId: string,
     @Body() updateProfileDto: UpdateProfileDto,
   ) {
-    return this.userService.updateProfileImage(user.id, updateProfileDto);
+    return this.userService.updateProfileImage(userId, updateProfileDto);
   }
 
   @Patch('/me/like/:id')
   @UseGuards(JwtAuthGuard)
   async addLikeUser(
     @Param('id') targetId: string,
-    @GetUser() user: UserDocument,
+    @GetUser('id') userId: string,
+    @Body('like') like: boolean,
   ) {
-    return this.userService.addLikeUser(targetId, user.id);
-  }
-
-  @Delete('/me/like/:id')
-  @UseGuards(JwtAuthGuard)
-  async deleteLikeUser(
-    @Param('id') targetId: string,
-    @GetUser() user: UserDocument,
-  ) {
-    return this.userService.deleteLikeUser(targetId, user.id);
+    console.log(targetId, userId, like);
+    return this.userService.changeLikeUser(targetId, userId, like);
   }
 
   @Post('/me/logout')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   async logoutUser(
-    @GetUser() user: UserDocument,
+    @GetUser('id') id: string,
     @Res({ passthrough: true }) res: Response,
   ) {
     res.clearCookie('refresh-token');
-    return await this.userService.logoutUser(user.id);
+    return await this.userService.logoutUser(id);
   }
 
   @Get('/:id')

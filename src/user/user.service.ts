@@ -73,7 +73,7 @@ export class UserService {
     return { message: `${user.nickname} 의 profile-image 변경 성공` };
   }
 
-  async addLikeUser(targetId: string, userId: string) {
+  async changeLikeUser(targetId: string, userId: string, like: boolean) {
     if (targetId === userId) {
       throw new BadRequestException();
     }
@@ -85,8 +85,15 @@ export class UserService {
     }
 
     try {
-      await user.updateOne({ $addToSet: { liked_users: targetUser } }).exec();
+      if (like) {
+        await user
+          .updateOne({ $addToSet: { liked_users: targetUser.id } })
+          .exec();
+      } else {
+        await user.updateOne({ $pull: { liked_users: targetUser.id } }).exec();
+      }
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(
         `${user?.nickname} 의 likedUsers 에 ${targetUser?.nickname} 추가 실패`,
       );
@@ -94,31 +101,6 @@ export class UserService {
 
     return {
       message: `${user.nickname} 의 likedUsers 에 ${targetUser.nickname} 추가 성공 `,
-    };
-  }
-
-  async deleteLikeUser(targetId: string, userId: string) {
-    if (targetId === userId) {
-      throw new BadRequestException();
-    }
-
-    const user = await this.getOneUser(userId);
-    const targetUser = await this.getOneUser(targetId);
-
-    if (!user || !targetUser) {
-      throw new BadRequestException();
-    }
-
-    try {
-      await user.updateOne({ $pull: { liked_users: targetUser.id } }).exec();
-    } catch (error) {
-      throw new BadRequestException(
-        `${user?.nickname} 의 likedUsers 에서 ${targetUser?.nickname} 제거 실패 `,
-      );
-    }
-
-    return {
-      message: `${user.nickname} 의 likedUsers 에서 ${targetUser.nickname} 제거 성공 `,
     };
   }
 
