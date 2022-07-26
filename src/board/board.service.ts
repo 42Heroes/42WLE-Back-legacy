@@ -44,8 +44,9 @@ export class BoardService {
     try {
       const author = await (
         await this.userService.getOneUser(userId)
-      ).update({ $pull: { board: boardId } });
-      const board = await this.boardModel.findById(boardId);
+      ).updateOne({ $pull: { board: boardId } });
+      await this.commentModel.deleteMany({ board: boardId });
+      await this.boardModel.findByIdAndDelete(boardId);
       //TODO: Comment에 boardID 추가, BoardID로 Comment 삭제
       await author.save();
       return true;
@@ -90,6 +91,7 @@ export class BoardService {
       const comment = new this.commentModel({
         author,
         content: commentCreateDto.content,
+        board,
       });
       board.comments.push(comment);
       await board.save();
