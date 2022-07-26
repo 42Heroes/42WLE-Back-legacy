@@ -18,9 +18,7 @@ export class Comment {
   @Prop({ required: true })
   content: string;
 
-  @Prop({
-    type: Array,
-  })
+  @Prop([String])
   likes: string[];
 
   @Prop({
