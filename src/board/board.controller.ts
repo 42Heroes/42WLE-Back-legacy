@@ -44,6 +44,7 @@ export class BoardController {
     @GetUser('id') id: string,
     @Body('boardId') boardId: string,
   ) {
+    console.log(boardId);
     return this.boardService.deleteBoard(id, boardId);
   }
 
