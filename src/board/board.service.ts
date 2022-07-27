@@ -42,12 +42,11 @@ export class BoardService {
 
   async deleteBoard(userId: string, boardId: string): Promise<boolean> {
     try {
-      const author = await (
+      await (
         await this.userService.getOneUser(userId)
       ).updateOne({ $pull: { board: boardId } });
       await this.commentModel.deleteMany({ board: boardId });
       await this.boardModel.findByIdAndDelete(boardId);
-      await author.save();
       return true;
     } catch (error) {
       throw new HttpException(error, 501);
