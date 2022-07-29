@@ -25,6 +25,8 @@ export class AuthController {
     const { tokens } = await this.authService.fortyTwoLogin(fortyTwoDto);
     res.cookie('refresh-token', tokens.refreshToken, {
       httpOnly: true,
+      secure: true,
+      sameSite: 'none',
     });
     return tokens.accessToken;
   }
