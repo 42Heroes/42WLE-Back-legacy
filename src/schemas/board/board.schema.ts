@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { Comment } from '../comment/comment.schema';
+import { Comment, CommentDocument } from '../comment/comment.schema';
 import { User } from '../user/user.schema';
 import { boardContents } from 'src/interface/board/boardContent.interface';
 
@@ -48,7 +48,7 @@ export class Board {
       },
     ],
   })
-  comments: Comment[];
+  comments: CommentDocument[];
 }
 
 export const BoardSchema = SchemaFactory.createForClass(Board);

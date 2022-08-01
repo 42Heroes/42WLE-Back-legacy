@@ -57,6 +57,7 @@ export class BoardController {
   @Post('like')
   @UseGuards(JwtAuthGuard)
   async likeBoard(@GetUser('id') id: string, @Body('boardId') boardId: string) {
+    console.log(boardId);
     return this.boardService.likeBoard(id, boardId);
   }
 

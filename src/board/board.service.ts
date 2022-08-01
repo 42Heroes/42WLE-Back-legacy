@@ -125,12 +125,18 @@ export class BoardService {
         throw new HttpException('삭제 권한이 없습니다.', 401);
       }
       const board = await this.boardModel.findById(boardId);
-      const index = board.comments.indexOf(comment.id);
-      board.comments.splice(index, 1);
-      comment.isDeleted = true;
-      comment.content = 'This comment is deleted';
-      await board.save();
-      await comment.save();
+      const isNestedCommentExist = comment.comments.length > 0 ? true : false;
+      if (isNestedCommentExist) {
+        comment.isDeleted = true;
+        comment.content = 'This comment is deleted';
+        await comment.save();
+      } else {
+        board.comments = board.comments.filter(
+          (comment) => comment.id !== commentId,
+        );
+        await this.commentModel.findByIdAndDelete(commentId);
+        await board.save();
+      }
       return board.comments;
     } catch (error) {
       throw new HttpException(error, 501);
