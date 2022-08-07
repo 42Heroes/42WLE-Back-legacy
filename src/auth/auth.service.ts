@@ -14,19 +14,12 @@ export class AuthService {
   ) {}
 
   async fortyTwoLogin(fortyTwoDto: FortyTwoDto) {
-    const { login: intra_id, campus, image_url } = fortyTwoDto;
+    const { login: intra_id } = fortyTwoDto;
 
     let user = await this.userService.isUser(intra_id);
 
     if (!user) {
-      const createData = {
-        intra_id,
-        nickname: intra_id,
-        campus: campus[0].name,
-        country: campus[0].country,
-        image_url,
-      };
-      user = await this.userService.createUser(createData);
+      user = await this.userService.createUser(fortyTwoDto);
     }
 
     const payload = {

@@ -20,6 +20,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     profile: any,
   ): Promise<any> {
     const userInfo = profile._json;
+
     return userInfo;
   }
 }
