@@ -1,17 +1,25 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { FortyTwoDto } from './dto/fortyTwo.dto';
-import * as bcrypt from 'bcrypt';
 import { UserDocument } from 'src/schemas/user/user.schema';
+import {
+  RefreshToken,
+  RefreshTokenDocument,
+} from 'src/schemas/auth/token.schema';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly config: ConfigService,
+    @InjectModel(RefreshToken.name)
+    private readonly refreshTokenModel: Model<RefreshTokenDocument>,
   ) {}
 
   async fortyTwoLogin(fortyTwoDto: FortyTwoDto) {
@@ -37,22 +45,34 @@ export class AuthService {
 
     const tokens = await this.getToken(payload);
 
-    user.rt = await bcrypt.hash(tokens.refreshToken, 10);
-    await user.save();
+    await this.updateRefreshToken(user, tokens.refreshToken);
 
     return { tokens };
   }
 
   async validateUser(intra_id: string) {
     const user = await this.userService.isUser(intra_id);
+
     if (!user) {
       return null;
     }
+
     return user;
   }
 
-  async updateRtUser(user_id: string) {
-    const user = await this.userService.getOneUser(user_id);
+  async updateRefreshToken(user: UserDocument, refreshToken: string) {
+    const token = await this.refreshTokenModel.findOne({ user: user.id });
+
+    if (!token) {
+      const newToken = new this.refreshTokenModel({
+        user: user.id,
+        refreshToken,
+      });
+      await newToken.save();
+    } else {
+      token.refreshToken = refreshToken;
+      await token.save();
+    }
   }
 
   async getToken(payload: any) {
@@ -87,5 +107,15 @@ export class AuthService {
     });
 
     return accessToken;
+  }
+
+  async getRefreshToken(user: UserDocument) {
+    const token = await this.refreshTokenModel.findOne({ user: user.id });
+
+    if (!token) {
+      return null;
+    }
+
+    return token;
   }
 }

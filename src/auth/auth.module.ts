@@ -8,9 +8,14 @@ import { ConfigService } from '@nestjs/config';
 import { JwtAccessStrategy } from './strategys/jwtAccess.strategy';
 import { PassportModule } from '@nestjs/passport';
 import { JwtRefreshStrategy } from './strategys/jwtRefresh.strategy';
+import { MongooseModule } from '@nestjs/mongoose';
+import { RefreshToken, TokenSchema } from 'src/schemas/auth/token.schema';
 
 @Module({
   imports: [
+    MongooseModule.forFeature([
+      { name: RefreshToken.name, schema: TokenSchema },
+    ]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -28,6 +33,6 @@ import { JwtRefreshStrategy } from './strategys/jwtRefresh.strategy';
     JwtRefreshStrategy,
     PassportModule,
   ],
-  exports: [JwtAccessStrategy, PassportModule],
+  exports: [JwtAccessStrategy, PassportModule, AuthService],
 })
 export class AuthModule {}
