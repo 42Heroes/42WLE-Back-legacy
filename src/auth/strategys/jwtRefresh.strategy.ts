@@ -8,15 +8,18 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
+import { AuthService } from '../auth.service';
 
 @Injectable()
-export class JwtRtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     private readonly config: ConfigService,
-    private readonly authService: AuthService,
     private readonly userService: UserService,
+    private readonly authService: AuthService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -29,20 +32,28 @@ export class JwtRtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
     });
   }
   async validate(req: Request, payload: any) {
-    const user = await this.userService.getOneUser(payload.id);
+    const { intra_id } = payload;
 
     try {
-      const isMatch = await bcrypt.compare(
-        req.cookies['refresh-token'],
-        user.rt,
-      );
-      if (!isMatch) {
-        throw new UnauthorizedException();
-      }
-    } catch (error) {
-      throw new BadRequestException();
-    }
+      const user = await this.userService.isUser(intra_id);
 
-    return user;
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const refreshToken = await this.authService.getRefreshToken(user);
+
+      const isValid =
+        refreshToken.refreshToken === req.cookies['refresh-token'];
+
+      if (!isValid) {
+        req.res.clearCookie('refresh-token');
+        throw new UnauthorizedException('Invalid refresh token');
+      }
+
+      return user;
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 }
