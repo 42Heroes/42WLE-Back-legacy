@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import { FortyTwoDto } from './dto/fortyTwo.dto';
 import * as bcrypt from 'bcrypt';
+import { UserDocument } from 'src/schemas/user/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -31,15 +32,14 @@ export class AuthService {
 
     const payload = {
       intra_id: user.intra_id,
-      nickname: user.nickname,
       id: user.id,
     };
 
     const tokens = await this.getToken(payload);
+
     user.rt = await bcrypt.hash(tokens.refreshToken, 10);
-    // TODO: 누군가 탈취해서 우리코드로 보내면 뚫리는거 아닌가? hash가 소용있나?
     await user.save();
-    console.log(tokens);
+
     return { tokens };
   }
 
@@ -56,10 +56,10 @@ export class AuthService {
   }
 
   async getToken(payload: any) {
-    const [at, rt] = await Promise.all([
+    const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.config.get<string>('JWT_AT_SECRET'),
-        expiresIn: 60 * 60 * 24 * 15,
+        expiresIn: 60 * 15,
       }),
       this.jwtService.signAsync(payload, {
         secret: this.config.get<string>('JWT_RT_SECRET'),
@@ -68,26 +68,24 @@ export class AuthService {
     ]);
 
     return {
-      accessToken: at,
-      refreshToken: rt,
+      accessToken,
+      refreshToken,
     };
   }
-  async getACToken(user) {
+
+  async getAccessToken(user: UserDocument) {
+    const { intra_id, id } = user;
+
     const payload = {
-      intra_id: user.intra_id,
-      nickname: user.nickname,
-      id: user.id,
+      intra_id,
+      id,
     };
-    const at = await this.jwtService.signAsync(payload, {
+
+    const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.config.get<string>('JWT_AT_SECRET'),
       expiresIn: 60 * 15,
     });
 
-    return at;
+    return accessToken;
   }
 }
-
-// export const hash = async (plainText: string): Promise<string> => {
-//   const saltOrRounds = 10;
-//   return await bcrypt.hash(plainText, saltOrRounds);
-// };

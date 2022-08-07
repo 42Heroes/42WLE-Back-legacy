@@ -8,14 +8,15 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
-export class JwtRtStrategy extends PassportStrategy(Strategy, 'jwt-refresh') {
+export class JwtRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     private readonly config: ConfigService,
-    private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {
     super({
