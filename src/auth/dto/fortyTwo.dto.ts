@@ -10,6 +10,7 @@ export class FortyTwoDto {
   phone: 'hidden' | string;
   displayname: string;
   image_url: string;
+  new_image_url: string;
   campus: Campus[];
 }
 interface Campus {
