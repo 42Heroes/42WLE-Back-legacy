@@ -74,13 +74,11 @@ export class EventsService {
 
   authorization(socket: Socket, token: string) {
     const bearerToken = token?.split(' ')[1];
-    console.log(bearerToken);
 
     try {
       const decode = this.jwtService.verify(bearerToken, {
         secret: this.configService.get<string>('JWT_AT_SECRET'),
       });
-      console.log(decode);
 
       socket.data.authenticate = true;
       socket.data.id = decode.id;

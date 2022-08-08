@@ -63,9 +63,6 @@ export class User {
 
   @Prop({ type: Boolean, default: false })
   isRegisterDone: boolean;
-
-  @Prop({ type: String, default: null })
-  rt: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

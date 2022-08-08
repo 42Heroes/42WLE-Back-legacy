@@ -5,12 +5,17 @@ import { FortyTwoStrategy } from './fortyTwo.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from 'src/user/user.module';
 import { ConfigService } from '@nestjs/config';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtAccessStrategy } from './strategys/jwtAccess.strategy';
 import { PassportModule } from '@nestjs/passport';
-import { JwtRtStrategy } from './jwtRt.strategy';
+import { JwtRefreshStrategy } from './strategys/jwtRefresh.strategy';
+import { MongooseModule } from '@nestjs/mongoose';
+import { RefreshToken, TokenSchema } from 'src/schemas/auth/token.schema';
 
 @Module({
   imports: [
+    MongooseModule.forFeature([
+      { name: RefreshToken.name, schema: TokenSchema },
+    ]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -24,10 +29,10 @@ import { JwtRtStrategy } from './jwtRt.strategy';
   providers: [
     AuthService,
     FortyTwoStrategy,
-    JwtStrategy,
-    JwtRtStrategy,
+    JwtAccessStrategy,
+    JwtRefreshStrategy,
     PassportModule,
   ],
-  exports: [JwtStrategy, PassportModule],
+  exports: [JwtAccessStrategy, PassportModule, AuthService],
 })
 export class AuthModule {}
