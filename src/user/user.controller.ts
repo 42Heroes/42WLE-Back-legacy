@@ -58,7 +58,6 @@ export class UserController {
     @GetUser('id') userId: string,
     @Body('like') like: boolean,
   ) {
-    console.log(targetId, userId, like);
     return this.userService.changeLikeUser(targetId, userId, like);
   }
 

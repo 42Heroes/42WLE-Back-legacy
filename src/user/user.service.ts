@@ -3,6 +3,8 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../schemas/user/user.schema';
@@ -10,11 +12,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { FortyTwoDto } from 'src/auth/dto/fortyTwo.dto';
 import { CreateUserDto } from './dto/create-user.dto';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
   async createUser(fortyTwoDto: FortyTwoDto): Promise<UserDocument> {
@@ -119,8 +124,7 @@ export class UserService {
   async logoutUser(userId: string) {
     const user = await this.getOneUser(userId);
 
-    user.rt = null;
-    await user.save();
+    await this.authService.updateRefreshToken(user, null);
 
     return 'logout success';
   }
