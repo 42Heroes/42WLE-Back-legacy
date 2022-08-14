@@ -39,18 +39,21 @@ export class EventsService {
       await this.userService.getOneUser(id)
     ).populate('chatRooms');
 
-    const result = await Promise.all(
-      user.chatRooms.map(async (chatRoom) => {
-        socket.join(chatRoom.id);
+    const promises = user.chatRooms.map(async (chatRoom) => {
+      socket.join(chatRoom.id);
 
-        const messages = await this.chatService.getAllMessages(chatRoom.id);
+      const messages = await this.chatService.getAllMessages(chatRoom.id);
 
-        return {
-          ...chatRoom.toObject(),
-          messages,
-        };
-      }),
-    );
+      return {
+        ...chatRoom.toObject(),
+        messages,
+        updatedAt: messages[messages.length - 1].createdAt,
+      };
+    });
+
+    const chatRooms: any = await Promise.all(promises);
+
+    const result = chatRooms.sort((a, b) => b.updatedAt - a.updatedAt);
 
     return result;
   }
