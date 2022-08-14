@@ -49,22 +49,10 @@ export class WsGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> | any {
     const socket = context.getArgByIndex(0);
-    // if (!socket.data.authenticate) {
-    //   return false;
-    // }
-    const bearerToken = socket.handshake.headers.authorization.split(' ')[1];
-    try {
-      const decoded = this.jwtService.verify(bearerToken, {
-        secret: 'gamguma',
-      });
-
-      return new Promise((resolve, reject) => {
-        return this.userService
-          .getOneUser(decoded.id)
-          .then((user) => (user ? resolve(user) : reject(user)));
-      });
-    } catch (error) {
+    if (!socket.data.authenticate) {
       return false;
+    } else {
+      return true;
     }
   }
 }
