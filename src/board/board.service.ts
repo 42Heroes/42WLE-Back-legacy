@@ -67,16 +67,17 @@ export class BoardService {
 
   async likeBoard(userId: string, boardId: string): Promise<any> {
     try {
-      const user = await this.userService.getOneUser(userId);
-      const board = await this.boardModel.findById(boardId);
-      const isExist = board.likes.indexOf(user.id);
+      const [user, board] = await Promise.all([
+        this.userService.getOneUser(userId),
+        this.boardModel.findById(boardId),
+      ]);
+      const isExist = board.likes.findIndex((like) => like.id === user.id);
       if (isExist === -1) {
         board.likes.push(user.id);
       } else {
         board.likes.splice(isExist, 1);
       }
-      await user.save();
-      await board.save();
+      await Promise.all([user.save(), board.save()]);
       return board.likes;
     } catch (error) {
       throw new HttpException(error, 501);
