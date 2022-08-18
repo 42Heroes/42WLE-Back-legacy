@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { Comment, CommentDocument } from '../comment/comment.schema';
-import { User } from '../user/user.schema';
+import { CommentDocument } from '../comment/comment.schema';
+import { User, UserDocument } from '../user/user.schema';
 import { boardContents } from 'src/interface/board/boardContent.interface';
 
 export type BoardDocument = Board & Document;
@@ -37,7 +37,7 @@ export class Board {
       },
     ],
   })
-  likes: User[];
+  likes: UserDocument[];
 
   @Prop({
     type: [
