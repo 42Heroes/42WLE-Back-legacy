@@ -1,0 +1,100 @@
+name: Deploy to EB
+
+# main branch에 push 되면 실행
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  buildAndTest:
+    name: CI Pipeline
+    runs-on: ubuntu-18.04
+    strategy:
+    # Node version은 12 버전을 이용한다.
+      matrix:
+        node-version: ['12.x']
+	
+    steps:
+      - uses: actions/checkout@v2
+	
+      # Initialize Node.js
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Install project dependencies, test and build
+      - name: Install dependencies
+        run: npm install
+      - name: Run build
+        run: npm run build
+
+  deploy:
+    name: CD Pipeline
+    runs-on: ubuntu-18.04
+
+    strategy:
+      matrix:
+        node-version: ['12.x']
+	# 위의 buildAndTest가 실행되고 진행된다.
+    needs: buildAndTest
+    steps:
+      - uses: actions/checkout@v2
+	  # env 파일을 이용할 일이 보통 많은데,
+      # Github Secrets를 이용하여 env 파일을 만들고 추가한다.
+      # 참고로 ElasticBeanstalk에 Node 관련을 배포할 때는,
+      # 8081 포트를 열어줘야 한다!!
+      - name: Create env file
+        run: |
+          touch .env
+          echo PORT=8081 >> .env
+          echo NODE_ENV=${{ secrets.NODE_ENV }} >> .env
+          cat .env
+      # Initialize Node.js
+      - name: Install Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Install project dependencies and build
+      - name: Install dependencies
+        run: npm install
+      # 필자는 TS 파일들을 빌드해서 dist 폴더에 js 파일들을 만들기 때문에
+      # 아래에서 zip 파일 구성 시 src 폴더를 제외한 것을 확인할 수 있다.
+      - name: Run build
+        run: npm run build
+
+      # Install AWS CLI 2
+      - name: Install AWS CLI 2
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          which aws
+          sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # Make ZIP file with source code
+      # -x는 zip파일 생성 시에 해당 부분들을 제외한다.
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*' './src/*' './aws/*' awscliv2.zip
+
+      # Deploy to Elastic Beanstalk
+      # application_name과 environment_name을 꼭 확인하자!
+      # 해당 부분은 꼭 같아야 한다!!
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v14
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: walkie-bean
+          environment_name: Walkiebean-env
+          region: ${{ secrets.AWS_REGION }}
+          version_label: ${{github.SHA}}
+          deployment_package: deploy.zip
