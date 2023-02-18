@@ -7,7 +7,7 @@ export class AppController {
 
   @Get()
   getHello(): string {
-    return 'hello';
+    return 'hell';
   }
   @Get('login')
   login() {
