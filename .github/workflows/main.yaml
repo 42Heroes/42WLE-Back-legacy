@@ -11,7 +11,7 @@ jobs:
     name: CI Pipeline
     runs-on: ubuntu-latest
     strategy:
-    # Node version은 12 버전을 이용한다.
+      # Node version은 12 버전을 이용한다.
       matrix:
         node-version: ['16.x']
     steps:
@@ -63,8 +63,8 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Generate deployment package
         run: zip -r deploy.zip . -x '*.git*' './src/*' './aws/*' awscliv2.zip
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v14
+      - name: Beanstalk Deploy
+        uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
