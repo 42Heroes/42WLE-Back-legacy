@@ -15,36 +15,36 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Use Node.js ${{ env.NODE_VERSION }}
-      uses: actions/setup-node@v2
-      with:
-        node-version: ${{ env.NODE_VERSION }}
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build app
-      run: npm run build
+      - name: Build app
+        run: npm run build
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.EB_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.EB_REGION }}
 
-    - name: Install EB CLI
-      run: |
-        sudo apt-get update
-        sudo apt-get install python3-pip
-        sudo pip3 install awsebcli
+      - name: Install EB CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pip
+          sudo pip3 install awsebcli
 
-    - name: Deploy app to Elastic Beanstalk
-      run: eb deploy ${{ env.EB_ENVIRONMENT_NAME }} --label ${{ github.sha }}
+      - name: Deploy app to Elastic Beanstalk
+        run: eb deploy ${{ env.EB_ENVIRONMENT_NAME }} --label ${{ github.sha }}
