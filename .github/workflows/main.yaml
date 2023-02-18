@@ -3,7 +3,7 @@ name: Deploy to AWS Elastic Beanstalk
 on:
   push:
     branches:
-      - main
+      - develop
 
 env:
   NODE_VERSION: 16.x
